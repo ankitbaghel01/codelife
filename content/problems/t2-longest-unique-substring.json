@@ -1,0 +1,134 @@
+{
+  "id": "t2-longest-unique-substring",
+  "version": 1,
+  "title": "Longest Fresh Streak",
+  "tier": "T2",
+  "difficulty": "medium",
+  "folder": "interview-prep",
+  "topic": "sliding-window",
+  "tags": [
+    "sliding-window",
+    "hash-map",
+    "strings"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "A password checker rewards long runs of characters that never repeat.\n\nGiven a string `s`, return the length of the **longest substring** (contiguous) in which **no character appears twice**.",
+  "function": {
+    "name": "longest_unique_run",
+    "params": [
+      {
+        "name": "s",
+        "type": "str"
+      }
+    ],
+    "returns": "int"
+  },
+  "constraints": [
+    "0 <= len(s) <= 10^5",
+    "s may contain letters, digits, symbols and spaces"
+  ],
+  "examples": [
+    {
+      "args": [
+        "abcabcbb"
+      ],
+      "expected": 3,
+      "explanation": "\"abc\" is the longest run with no repeats."
+    },
+    {
+      "args": [
+        "bbbb"
+      ],
+      "expected": 1,
+      "explanation": "Every run longer than one repeats 'b'."
+    }
+  ],
+  "starter": {
+    "python": "def longest_unique_run(s):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        ""
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        "pwwkew"
+      ],
+      "expected": 3
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        "a"
+      ],
+      "expected": 1
+    },
+    {
+      "args": [
+        "abcdef"
+      ],
+      "expected": 6
+    },
+    {
+      "args": [
+        "abba"
+      ],
+      "expected": 2
+    },
+    {
+      "args": [
+        "dvdf"
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        "tmmzuxt"
+      ],
+      "expected": 5
+    },
+    {
+      "args": [
+        "a b c a"
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        "xyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxy"
+      ],
+      "expected": 2
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Grow a window to the right, and shrink it from the left whenever it contains a repeat.",
+    "Remember the last index where you saw each character.",
+    "Keep start = 0 and last = {}. For each i, ch: if last.get(ch, -1) >= start, set start = last[ch] + 1. Then last[ch] = i and best = max(best, i - start + 1)."
+  ],
+  "followUps": [
+    "How would you return the substring itself, not only its length?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(min(n, alphabet))"
+  }
+}

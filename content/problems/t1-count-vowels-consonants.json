@@ -1,0 +1,166 @@
+{
+  "id": "t1-count-vowels-consonants",
+  "version": 1,
+  "title": "Vowel Meter",
+  "tier": "T1",
+  "difficulty": "easy",
+  "folder": "basics",
+  "topic": "strings",
+  "tags": [
+    "strings",
+    "counting"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "The ed-tech app shows kids a vowel/consonant meter for each word they type.\n\nGiven `text`, return a list `[vowels, consonants]` counting the English letters in it. Vowels are `a e i o u` (any case). Every other English letter, including `y`, is a consonant. Ignore digits, spaces and punctuation.",
+  "function": {
+    "name": "count_letters",
+    "params": [
+      {
+        "name": "text",
+        "type": "str"
+      }
+    ],
+    "returns": "list[int]"
+  },
+  "constraints": [
+    "0 <= len(text) <= 10^5"
+  ],
+  "examples": [
+    {
+      "args": [
+        "Hello World"
+      ],
+      "expected": [
+        3,
+        7
+      ],
+      "explanation": "Vowels: e, o, o. Consonants: H, l, l, W, r, l, d."
+    },
+    {
+      "args": [
+        "2024!"
+      ],
+      "expected": [
+        0,
+        0
+      ],
+      "explanation": "No letters at all."
+    }
+  ],
+  "starter": {
+    "python": "def count_letters(text):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        "aeiou"
+      ],
+      "expected": [
+        5,
+        0
+      ]
+    },
+    {
+      "args": [
+        "Rhythm"
+      ],
+      "expected": [
+        0,
+        6
+      ]
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        ""
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        "A"
+      ],
+      "expected": [
+        1,
+        0
+      ]
+    },
+    {
+      "args": [
+        "b"
+      ],
+      "expected": [
+        0,
+        1
+      ]
+    },
+    {
+      "args": [
+        "AEIOU aeiou"
+      ],
+      "expected": [
+        10,
+        0
+      ]
+    },
+    {
+      "args": [
+        "Sky is blue."
+      ],
+      "expected": [
+        3,
+        6
+      ]
+    },
+    {
+      "args": [
+        "Code-Life v2.0"
+      ],
+      "expected": [
+        4,
+        5
+      ]
+    },
+    {
+      "args": [
+        "abababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababab"
+      ],
+      "expected": [
+        1000,
+        1000
+      ]
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "First decide whether a character is a letter at all.",
+    "A small set like set('aeiou') makes the vowel check easy after lowercasing.",
+    "Loop once: skip non-letters, then add to vowels if in the set, otherwise to consonants."
+  ],
+  "followUps": [
+    "How would you extend this to count each vowel separately?",
+    "What would you change to support accented letters like 'é'?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(1)"
+  }
+}

@@ -1,0 +1,250 @@
+{
+  "id": "t2-level-order",
+  "version": 1,
+  "title": "Floor by Floor",
+  "tier": "T2",
+  "difficulty": "medium",
+  "folder": "data-structures",
+  "topic": "tree",
+  "tags": [
+    "tree",
+    "bfs",
+    "queue"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "The building directory lists departments one floor at a time, left to right.\n\nGiven the `root` of a binary tree, return its values **level by level**: a list of lists, where the inner list `i` holds the values on depth `i` from left to right. An empty tree gives `[]`.\n\nTrees are passed as a `TreeNode` (with `.val`, `.left`, `.right`; the class is already defined for you). In examples a tree is written in level order with `null` for missing children, for example `[3, 9, 20, null, null, 15, 7]`, and `[]` means an empty tree (`None`).",
+  "function": {
+    "name": "level_order",
+    "params": [
+      {
+        "name": "root",
+        "type": "TreeNode"
+      }
+    ],
+    "returns": "list[list[int]]"
+  },
+  "constraints": [
+    "0 <= number of nodes <= 2000"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          3,
+          9,
+          20,
+          null,
+          null,
+          15,
+          7
+        ]
+      ],
+      "expected": [
+        [
+          3
+        ],
+        [
+          9,
+          20
+        ],
+        [
+          15,
+          7
+        ]
+      ],
+      "explanation": "Three levels, read left to right."
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          null,
+          4
+        ]
+      ],
+      "expected": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          4
+        ]
+      ],
+      "explanation": "Each level has one node."
+    }
+  ],
+  "starter": {
+    "python": "def level_order(root):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        []
+      ],
+      "expected": []
+    },
+    {
+      "args": [
+        [
+          5
+        ]
+      ],
+      "expected": [
+        [
+          5
+        ]
+      ]
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      ],
+      "expected": [
+        [
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5,
+          6,
+          7
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          1,
+          null,
+          2,
+          null,
+          3
+        ]
+      ],
+      "expected": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          0,
+          -1,
+          1,
+          null,
+          null,
+          null,
+          2
+        ]
+      ],
+      "expected": [
+        [
+          0
+        ],
+        [
+          -1,
+          1
+        ],
+        [
+          2
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          3,
+          null,
+          4,
+          5
+        ]
+      ],
+      "expected": [
+        [
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          8,
+          8,
+          8
+        ]
+      ],
+      "expected": [
+        [
+          8
+        ],
+        [
+          8,
+          8
+        ]
+      ]
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Visit nodes in the order of their distance from the root.",
+    "A queue (breadth-first search) does that; process one whole level at a time.",
+    "Start with level = [root]; while level is non-empty, record [n.val for n in level] and build the next level from the non-None children."
+  ],
+  "followUps": [
+    "How would you return the levels in zigzag order (left-to-right, then right-to-left)?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(n)"
+  }
+}

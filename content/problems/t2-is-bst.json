@@ -1,0 +1,187 @@
+{
+  "id": "t2-is-bst",
+  "version": 1,
+  "title": "Check the Index Tree",
+  "tier": "T2",
+  "difficulty": "medium",
+  "folder": "data-structures",
+  "topic": "tree",
+  "tags": [
+    "tree",
+    "bst",
+    "recursion"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "The search index is supposed to be a binary search tree, but a bad migration may have broken it.\n\nGiven the `root` of a binary tree, return `True` if it is a valid **binary search tree**: for every node, all values in its left subtree are **strictly smaller** and all values in its right subtree are **strictly larger**. An empty tree is valid.\n\nTrees are passed as a `TreeNode` (with `.val`, `.left`, `.right`; the class is already defined for you). In examples a tree is written in level order with `null` for missing children, for example `[3, 9, 20, null, null, 15, 7]`, and `[]` means an empty tree (`None`).",
+  "function": {
+    "name": "is_bst",
+    "params": [
+      {
+        "name": "root",
+        "type": "TreeNode"
+      }
+    ],
+    "returns": "bool"
+  },
+  "constraints": [
+    "0 <= number of nodes <= 10^4",
+    "-2^31 <= node.val <= 2^31 - 1"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          5,
+          3,
+          8,
+          1,
+          4
+        ]
+      ],
+      "expected": true,
+      "explanation": "Every left subtree is smaller and every right subtree larger."
+    },
+    {
+      "args": [
+        [
+          5,
+          3,
+          8,
+          1,
+          6
+        ]
+      ],
+      "expected": false,
+      "explanation": "6 is in the left subtree of 5 but is larger than 5."
+    }
+  ],
+  "starter": {
+    "python": "def is_bst(root):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        []
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        [
+          2,
+          2
+        ]
+      ],
+      "expected": false
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [
+          1
+        ]
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        [
+          2,
+          1,
+          3
+        ]
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        [
+          10,
+          5,
+          15,
+          null,
+          null,
+          6,
+          20
+        ]
+      ],
+      "expected": false
+    },
+    {
+      "args": [
+        [
+          3,
+          1,
+          5,
+          0,
+          2,
+          4,
+          6
+        ]
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        [
+          1,
+          null,
+          1
+        ]
+      ],
+      "expected": false
+    },
+    {
+      "args": [
+        [
+          -2147483648,
+          null,
+          2147483647
+        ]
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        [
+          5,
+          4,
+          6,
+          null,
+          null,
+          3,
+          7
+        ]
+      ],
+      "expected": false
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Checking each node only against its direct children is not enough.",
+    "Every node must sit inside a range set by all of its ancestors.",
+    "Recurse with (node, low, high): the node must satisfy low < val < high; go left with (low, val) and right with (val, high), starting from (-inf, inf)."
+  ],
+  "followUps": [
+    "How would an in-order traversal let you check the same property?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(h)"
+  }
+}

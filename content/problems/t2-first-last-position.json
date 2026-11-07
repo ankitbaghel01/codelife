@@ -1,0 +1,422 @@
+{
+  "id": "t2-first-last-position",
+  "version": 1,
+  "title": "Span of a Score",
+  "tier": "T2",
+  "difficulty": "medium",
+  "folder": "basics",
+  "topic": "searching",
+  "tags": [
+    "binary-search",
+    "arrays"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "The exam portal stores marks in sorted order, with repeats. A teacher wants to know where a particular mark starts and ends.\n\nGiven a list `nums` sorted in **non-decreasing** order and an integer `target`, return `[first, last]`: the first and last index where `target` appears. If it does not appear, return `[-1, -1]`. Aim for O(log n).",
+  "function": {
+    "name": "find_span",
+    "params": [
+      {
+        "name": "nums",
+        "type": "list[int]"
+      },
+      {
+        "name": "target",
+        "type": "int"
+      }
+    ],
+    "returns": "list[int]"
+  },
+  "constraints": [
+    "0 <= len(nums) <= 10^5",
+    "nums is sorted in non-decreasing order"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          1,
+          3,
+          3,
+          3,
+          6,
+          9
+        ],
+        3
+      ],
+      "expected": [
+        1,
+        3
+      ],
+      "explanation": "3 occupies indices 1 through 3."
+    },
+    {
+      "args": [
+        [
+          1,
+          3,
+          3,
+          3,
+          6,
+          9
+        ],
+        4
+      ],
+      "expected": [
+        -1,
+        -1
+      ],
+      "explanation": "4 never appears."
+    }
+  ],
+  "starter": {
+    "python": "def find_span(nums, target):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          7,
+          7,
+          7
+        ],
+        7
+      ],
+      "expected": [
+        0,
+        2
+      ]
+    },
+    {
+      "args": [
+        [
+          2,
+          4,
+          6
+        ],
+        6
+      ],
+      "expected": [
+        2,
+        2
+      ]
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [],
+        1
+      ],
+      "expected": [
+        -1,
+        -1
+      ]
+    },
+    {
+      "args": [
+        [
+          5
+        ],
+        5
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        [
+          5
+        ],
+        6
+      ],
+      "expected": [
+        -1,
+        -1
+      ]
+    },
+    {
+      "args": [
+        [
+          1,
+          1,
+          2,
+          2,
+          2,
+          2,
+          3
+        ],
+        2
+      ],
+      "expected": [
+        2,
+        5
+      ]
+    },
+    {
+      "args": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        0
+      ],
+      "expected": [
+        0,
+        49
+      ]
+    },
+    {
+      "args": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        1
+      ],
+      "expected": [
+        50,
+        99
+      ]
+    },
+    {
+      "args": [
+        [
+          -3,
+          -3,
+          -1,
+          0
+        ],
+        -2
+      ],
+      "expected": [
+        -1,
+        -1
+      ]
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Run binary search twice: once for the left edge, once for the right.",
+    "For the left edge, when you hit the target keep searching to the left instead of stopping.",
+    "Search for the first index with nums[i] >= target and the first with nums[i] > target (like bisect_left and bisect_right). If the first one is out of range or not equal to target, answer [-1, -1]."
+  ],
+  "followUps": [
+    "How would you count how many times target appears using the same idea?"
+  ],
+  "complexity": {
+    "time": "O(log n)",
+    "space": "O(1)"
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "id": "t2-eval-rpn",
+  "version": 1,
+  "title": "Postfix Calculator",
+  "tier": "T2",
+  "difficulty": "medium",
+  "folder": "data-structures",
+  "topic": "stack",
+  "tags": [
+    "stack",
+    "math"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "An old lab calculator takes its input in postfix order: operands first, then the operator.\n\nGiven a list of string `tokens`, where each token is an integer or one of `+ - * /`, evaluate the expression and return the integer result. Division **truncates toward zero** (so `-7 / 2` is `-3`). The input is always a valid expression and never divides by zero.",
+  "function": {
+    "name": "eval_postfix",
+    "params": [
+      {
+        "name": "tokens",
+        "type": "list[str]"
+      }
+    ],
+    "returns": "int"
+  },
+  "constraints": [
+    "1 <= len(tokens) <= 10^4",
+    "intermediate values fit in a 32-bit signed integer"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          "3",
+          "4",
+          "+",
+          "2",
+          "*"
+        ]
+      ],
+      "expected": 14,
+      "explanation": "(3 + 4) * 2 = 14."
+    },
+    {
+      "args": [
+        [
+          "10",
+          "3",
+          "/"
+        ]
+      ],
+      "expected": 3,
+      "explanation": "10 / 3 truncates to 3."
+    }
+  ],
+  "starter": {
+    "python": "def eval_postfix(tokens):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          "5"
+        ]
+      ],
+      "expected": 5
+    },
+    {
+      "args": [
+        [
+          "2",
+          "7",
+          "-"
+        ]
+      ],
+      "expected": -5
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [
+          "-7",
+          "2",
+          "/"
+        ]
+      ],
+      "expected": -3
+    },
+    {
+      "args": [
+        [
+          "7",
+          "-2",
+          "/"
+        ]
+      ],
+      "expected": -3
+    },
+    {
+      "args": [
+        [
+          "4",
+          "13",
+          "5",
+          "/",
+          "+"
+        ]
+      ],
+      "expected": 6
+    },
+    {
+      "args": [
+        [
+          "1",
+          "2",
+          "+",
+          "3",
+          "4",
+          "+",
+          "*"
+        ]
+      ],
+      "expected": 21
+    },
+    {
+      "args": [
+        [
+          "0",
+          "5",
+          "*"
+        ]
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        [
+          "15",
+          "7",
+          "1",
+          "1",
+          "+",
+          "-",
+          "/",
+          "3",
+          "*",
+          "2",
+          "1",
+          "1",
+          "+",
+          "+",
+          "-"
+        ]
+      ],
+      "expected": 5
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Numbers wait until an operator comes along to use them.",
+    "Push numbers on a stack; an operator pops the top two values.",
+    "Pop b then a (order matters for - and /), push the result of a op b. For division use int(a / b) to truncate toward zero, not a // b."
+  ],
+  "followUps": [
+    "How would you convert a normal infix expression like (3 + 4) * 2 into postfix?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(n)"
+  }
+}

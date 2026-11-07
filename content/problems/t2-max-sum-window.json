@@ -1,0 +1,283 @@
+{
+  "id": "t2-max-sum-window",
+  "version": 1,
+  "title": "Best Week of Sales",
+  "tier": "T2",
+  "difficulty": "easy",
+  "folder": "interview-prep",
+  "topic": "sliding-window",
+  "tags": [
+    "sliding-window",
+    "arrays"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "The canteen wants to know its best run of `k` consecutive days.\n\nGiven a list of integers `sales` (values can be negative for refund-heavy days) and an integer `k`, return the **largest sum** of any `k` consecutive values.",
+  "function": {
+    "name": "best_window_sum",
+    "params": [
+      {
+        "name": "sales",
+        "type": "list[int]"
+      },
+      {
+        "name": "k",
+        "type": "int"
+      }
+    ],
+    "returns": "int"
+  },
+  "constraints": [
+    "1 <= k <= len(sales) <= 10^5",
+    "-10^4 <= sales[i] <= 10^4"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          2,
+          1,
+          5,
+          1,
+          3,
+          2
+        ],
+        3
+      ],
+      "expected": 9,
+      "explanation": "5 + 1 + 3 = 9 is the best three-day run."
+    },
+    {
+      "args": [
+        [
+          4,
+          -1,
+          2
+        ],
+        1
+      ],
+      "expected": 4,
+      "explanation": "With k = 1 the answer is the single best day."
+    }
+  ],
+  "starter": {
+    "python": "def best_window_sum(sales, k):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          -3,
+          -2,
+          -5
+        ],
+        2
+      ],
+      "expected": -5
+    },
+    {
+      "args": [
+        [
+          7,
+          7
+        ],
+        2
+      ],
+      "expected": 14
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [
+          5
+        ],
+        1
+      ],
+      "expected": 5
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        5
+      ],
+      "expected": 15
+    },
+    {
+      "args": [
+        [
+          -1,
+          -1,
+          -1,
+          10
+        ],
+        2
+      ],
+      "expected": 9
+    },
+    {
+      "args": [
+        [
+          3,
+          -10,
+          3,
+          3
+        ],
+        2
+      ],
+      "expected": 6
+    },
+    {
+      "args": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99
+        ],
+        10
+      ],
+      "expected": 945
+    },
+    {
+      "args": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        3
+      ],
+      "expected": 0
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Re-adding all k values for every window repeats a lot of work.",
+    "When the window slides by one, only one value enters and one leaves.",
+    "Start with sum(sales[:k]); for i from k on, add sales[i] and subtract sales[i - k], tracking the maximum."
+  ],
+  "followUps": [
+    "What if the window length could be anything from 1 to n? (Look up Kadane's algorithm.)"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(1)"
+  }
+}

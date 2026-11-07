@@ -1,0 +1,18 @@
+# Reference solution for t2-eval-rpn (trusted, server/learning only; never ship to the client).
+
+def eval_postfix(tokens):
+    stack = []
+    for t in tokens:
+        if t in ("+", "-", "*", "/"):
+            b, a = stack.pop(), stack.pop()
+            if t == "+":
+                stack.append(a + b)
+            elif t == "-":
+                stack.append(a - b)
+            elif t == "*":
+                stack.append(a * b)
+            else:
+                stack.append(int(a / b))
+        else:
+            stack.append(int(t))
+    return stack[0]

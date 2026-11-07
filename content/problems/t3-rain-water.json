@@ -1,0 +1,288 @@
+{
+  "id": "t3-rain-water",
+  "version": 1,
+  "title": "Rooftop Puddles",
+  "tier": "T3",
+  "difficulty": "hard",
+  "folder": "interview-prep",
+  "topic": "two-pointers",
+  "tags": [
+    "two-pointers",
+    "arrays"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "A pixel-art city skyline is a row of buildings, each 1 unit wide. After a storm, water collects between them.\n\nGiven a list of non-negative integers `heights`, return the total **units of water** trapped. Water above position `i` rises to the smaller of the tallest building on its left and the tallest on its right, minus `heights[i]` (never below zero).",
+  "function": {
+    "name": "trapped_water",
+    "params": [
+      {
+        "name": "heights",
+        "type": "list[int]"
+      }
+    ],
+    "returns": "int"
+  },
+  "constraints": [
+    "0 <= len(heights) <= 10^5",
+    "0 <= heights[i] <= 10^5"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          3,
+          0,
+          2,
+          0,
+          4
+        ]
+      ],
+      "expected": 7,
+      "explanation": "Water levels over the gaps are 3, 1 and 3 units."
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ]
+      ],
+      "expected": 0,
+      "explanation": "Heights only rise, so water runs off."
+    }
+  ],
+  "starter": {
+    "python": "def trapped_water(heights):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          2,
+          0,
+          2
+        ]
+      ],
+      "expected": 2
+    },
+    {
+      "args": [
+        []
+      ],
+      "expected": 0
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [
+          5
+        ]
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        [
+          4,
+          2,
+          0,
+          3,
+          2,
+          5
+        ]
+      ],
+      "expected": 9
+    },
+    {
+      "args": [
+        [
+          0,
+          1,
+          0,
+          2,
+          1,
+          0,
+          1,
+          3,
+          2,
+          1,
+          2,
+          1
+        ]
+      ],
+      "expected": 6
+    },
+    {
+      "args": [
+        [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        [
+          5,
+          0,
+          0,
+          0,
+          0,
+          1
+        ]
+      ],
+      "expected": 4
+    },
+    {
+      "args": [
+        [
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      ],
+      "expected": 50
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Each position only cares about the tallest wall on its left and on its right.",
+    "Precomputing left-max and right-max arrays works in O(n) space. Two pointers can do it in O(1).",
+    "Keep lo, hi, left_max, right_max. Move the side with the lower wall: if heights[lo] < heights[hi], update left_max and add left_max - heights[lo], then lo += 1; otherwise mirror on the right."
+  ],
+  "followUps": [
+    "Why is it safe to settle the lower side first when using two pointers?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(1)"
+  }
+}

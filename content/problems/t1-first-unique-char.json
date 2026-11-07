@@ -1,0 +1,135 @@
+{
+  "id": "t1-first-unique-char",
+  "version": 1,
+  "title": "Lone Character",
+  "tier": "T1",
+  "difficulty": "easy",
+  "folder": "data-structures",
+  "topic": "hash-map",
+  "tags": [
+    "strings",
+    "hash-map",
+    "counting"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "A password-strength helper wants the first character that is never repeated.\n\nGiven `text`, return the **index** of the first character that appears **exactly once**. Matching is case-sensitive. If no such character exists, return `-1`.",
+  "function": {
+    "name": "first_unique_index",
+    "params": [
+      {
+        "name": "text",
+        "type": "str"
+      }
+    ],
+    "returns": "int"
+  },
+  "constraints": [
+    "0 <= len(text) <= 10^5",
+    "text contains only English letters (a-z, A-Z)"
+  ],
+  "examples": [
+    {
+      "args": [
+        "swiss"
+      ],
+      "expected": 1,
+      "explanation": "'s' repeats, 'w' at index 1 appears once."
+    },
+    {
+      "args": [
+        "aabb"
+      ],
+      "expected": -1,
+      "explanation": "Every character repeats."
+    }
+  ],
+  "starter": {
+    "python": "def first_unique_index(text):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        "codelife"
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        "xxyz"
+      ],
+      "expected": 2
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        ""
+      ],
+      "expected": -1
+    },
+    {
+      "args": [
+        "z"
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        "aA"
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        "abcabcd"
+      ],
+      "expected": 6
+    },
+    {
+      "args": [
+        "stress"
+      ],
+      "expected": 1
+    },
+    {
+      "args": [
+        "aabbccd"
+      ],
+      "expected": 6
+    },
+    {
+      "args": [
+        "ababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababc"
+      ],
+      "expected": 2000
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Checking text.count(c) for every character is slow; avoid rescanning.",
+    "Count every character once with a dictionary first.",
+    "Two passes: build the counts, then scan from the left and return the first index whose count is 1."
+  ],
+  "followUps": [
+    "If characters arrived as a stream, how would you track the first unique one so far?",
+    "Can you do it with a fixed-size array instead of a dictionary?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(1) (at most 52 distinct letters)"
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "id": "t2-remove-nth-from-end",
+  "version": 1,
+  "title": "Drop a Late Stop",
+  "tier": "T2",
+  "difficulty": "medium",
+  "folder": "data-structures",
+  "topic": "linked-list",
+  "tags": [
+    "linked-list",
+    "two-pointers"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "A playlist is a singly linked list. The user wants to delete the song that is `n` places from the end.\n\nGiven the `head` of a linked list and an integer `n`, remove the `n`-th node **from the end** (n = 1 is the last node) and return the head of the changed list.\n\nLinked lists are passed as a `ListNode` (with `.val` and `.next`; the class is already defined for you). In examples a list is written as its values, for example `[1, 2, 3]`, and `[]` means `None`.",
+  "function": {
+    "name": "remove_nth_from_end",
+    "params": [
+      {
+        "name": "head",
+        "type": "ListNode"
+      },
+      {
+        "name": "n",
+        "type": "int"
+      }
+    ],
+    "returns": "ListNode"
+  },
+  "constraints": [
+    "1 <= number of nodes <= 1000",
+    "1 <= n <= number of nodes"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        2
+      ],
+      "expected": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "explanation": "4 is second from the end."
+    },
+    {
+      "args": [
+        [
+          1,
+          2
+        ],
+        2
+      ],
+      "expected": [
+        2
+      ],
+      "explanation": "Removing the 2nd from the end of a two-node list removes the head."
+    }
+  ],
+  "starter": {
+    "python": "def remove_nth_from_end(head, n):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          8
+        ],
+        1
+      ],
+      "expected": []
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ],
+        1
+      ],
+      "expected": [
+        1,
+        2
+      ]
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ],
+        3
+      ],
+      "expected": [
+        2,
+        3
+      ]
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ],
+        2
+      ],
+      "expected": [
+        1,
+        3
+      ]
+    },
+    {
+      "args": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        10
+      ],
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "args": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        1
+      ],
+      "expected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "args": [
+        [
+          5,
+          5,
+          5,
+          5
+        ],
+        3
+      ],
+      "expected": [
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "args": [
+        [
+          7,
+          6
+        ],
+        1
+      ],
+      "expected": [
+        7
+      ]
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "If you knew the length L, the node to remove is at position L - n from the front.",
+    "Two pointers n nodes apart let you find it in one pass. A dummy node in front of the head avoids a special case.",
+    "Put dummy -> head; move fast n steps ahead, then move fast and slow together until fast.next is None; set slow.next = slow.next.next and return dummy.next."
+  ],
+  "followUps": [
+    "Why does the dummy node make removing the head work with no extra branch?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(1)"
+  }
+}

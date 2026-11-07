@@ -1,0 +1,171 @@
+{
+  "id": "t1-tree-max-depth",
+  "version": 1,
+  "title": "Org Chart Depth",
+  "tier": "T1",
+  "difficulty": "easy",
+  "folder": "data-structures",
+  "topic": "tree",
+  "tags": [
+    "tree",
+    "recursion",
+    "dfs"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "HR stores the reporting chain as a binary tree and wants to know how many levels it has.\n\nGiven the `root` of a binary tree, return its **maximum depth**: the number of nodes on the longest path from the root down to a leaf. An empty tree has depth 0.\n\nTrees are passed as a `TreeNode` (with `.val`, `.left`, `.right`; the class is already defined for you). In examples a tree is written in level order with `null` for missing children, for example `[3, 9, 20, null, null, 15, 7]`, and `[]` means an empty tree (`None`).",
+  "function": {
+    "name": "max_depth",
+    "params": [
+      {
+        "name": "root",
+        "type": "TreeNode"
+      }
+    ],
+    "returns": "int"
+  },
+  "constraints": [
+    "0 <= number of nodes <= 10^4"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          3,
+          9,
+          20,
+          null,
+          null,
+          15,
+          7
+        ]
+      ],
+      "expected": 3,
+      "explanation": "The path 3 -> 20 -> 15 has three nodes."
+    },
+    {
+      "args": [
+        []
+      ],
+      "expected": 0,
+      "explanation": "An empty tree has no levels."
+    }
+  ],
+  "starter": {
+    "python": "def max_depth(root):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          1
+        ]
+      ],
+      "expected": 1
+    },
+    {
+      "args": [
+        [
+          1,
+          null,
+          2
+        ]
+      ],
+      "expected": 2
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          null,
+          3,
+          null,
+          4,
+          null,
+          5
+        ]
+      ],
+      "expected": 5
+    },
+    {
+      "args": [
+        [
+          0,
+          null,
+          0,
+          null,
+          0
+        ]
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        [
+          5,
+          4,
+          8,
+          11,
+          null,
+          13,
+          4,
+          7,
+          2
+        ]
+      ],
+      "expected": 4
+    },
+    {
+      "args": [
+        [
+          -1,
+          -2
+        ]
+      ],
+      "expected": 2
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "The depth of a tree depends on the depths of its two subtrees.",
+    "Recursion fits well: an empty tree is the base case.",
+    "max_depth(None) = 0; otherwise 1 + max(max_depth(root.left), max_depth(root.right))."
+  ],
+  "followUps": [
+    "How would you compute the depth with a queue instead of recursion?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(h)"
+  }
+}

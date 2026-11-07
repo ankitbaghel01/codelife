@@ -1,0 +1,125 @@
+{
+  "id": "t2-climbing-stairs",
+  "version": 1,
+  "title": "Stairwell Strides",
+  "tier": "T2",
+  "difficulty": "easy",
+  "folder": "interview-prep",
+  "topic": "dynamic-programming",
+  "tags": [
+    "dynamic-programming"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "The lift is broken again. You climb `n` steps, taking either **1 or 2** steps at a time.\n\nGiven `n`, return the number of **different ways** to reach the top. For `n = 0` there is exactly one way (do nothing).",
+  "function": {
+    "name": "count_ways",
+    "params": [
+      {
+        "name": "n",
+        "type": "int"
+      }
+    ],
+    "returns": "int"
+  },
+  "constraints": [
+    "0 <= n <= 70"
+  ],
+  "examples": [
+    {
+      "args": [
+        3
+      ],
+      "expected": 3,
+      "explanation": "1+1+1, 1+2 and 2+1."
+    },
+    {
+      "args": [
+        4
+      ],
+      "expected": 5,
+      "explanation": "1+1+1+1, 1+1+2, 1+2+1, 2+1+1 and 2+2."
+    }
+  ],
+  "starter": {
+    "python": "def count_ways(n):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        1
+      ],
+      "expected": 1
+    },
+    {
+      "args": [
+        2
+      ],
+      "expected": 2
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        0
+      ],
+      "expected": 1
+    },
+    {
+      "args": [
+        5
+      ],
+      "expected": 8
+    },
+    {
+      "args": [
+        10
+      ],
+      "expected": 89
+    },
+    {
+      "args": [
+        30
+      ],
+      "expected": 1346269
+    },
+    {
+      "args": [
+        45
+      ],
+      "expected": 1836311903
+    },
+    {
+      "args": [
+        70
+      ],
+      "expected": 308061521170129
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Think about the very last move: it was either 1 step or 2 steps.",
+    "So ways(n) = ways(n - 1) + ways(n - 2). Plain recursion repeats work, so remember results.",
+    "Loop upwards keeping only the last two values: a, b = 1, 1; repeat n times: a, b = b, a + b; return a."
+  ],
+  "followUps": [
+    "What if you could take 1, 2 or 3 steps? What if some steps are broken?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(1)"
+  }
+}

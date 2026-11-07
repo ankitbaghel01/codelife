@@ -1,0 +1,227 @@
+{
+  "id": "t1-sort-by-frequency",
+  "version": 1,
+  "title": "Popular Tickets First",
+  "tier": "T1",
+  "difficulty": "easy",
+  "folder": "basics",
+  "topic": "sorting",
+  "tags": [
+    "sorting",
+    "hashing"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "Support wants to see the most reported bug ids at the top.\n\nGiven a list of integers `nums`, return a list with the same values reordered so that values that appear **more often come first**. When two values appear the same number of times, the **smaller value comes first**. Every copy of a value stays in the output, grouped together.",
+  "function": {
+    "name": "sort_by_frequency",
+    "params": [
+      {
+        "name": "nums",
+        "type": "list[int]"
+      }
+    ],
+    "returns": "list[int]"
+  },
+  "constraints": [
+    "0 <= len(nums) <= 10^4",
+    "-10^4 <= nums[i] <= 10^4"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          4,
+          6,
+          4,
+          2,
+          6,
+          4
+        ]
+      ],
+      "expected": [
+        4,
+        4,
+        4,
+        6,
+        6,
+        2
+      ],
+      "explanation": "4 appears 3 times, 6 twice, 2 once."
+    },
+    {
+      "args": [
+        [
+          3,
+          1,
+          3,
+          1
+        ]
+      ],
+      "expected": [
+        1,
+        1,
+        3,
+        3
+      ],
+      "explanation": "1 and 3 tie at two each, so the smaller value 1 goes first."
+    }
+  ],
+  "starter": {
+    "python": "def sort_by_frequency(nums):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          7
+        ]
+      ],
+      "expected": [
+        7
+      ]
+    },
+    {
+      "args": [
+        [
+          5,
+          -1,
+          5,
+          -1,
+          0
+        ]
+      ],
+      "expected": [
+        -1,
+        -1,
+        5,
+        5,
+        0
+      ]
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        []
+      ],
+      "expected": []
+    },
+    {
+      "args": [
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "expected": [
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "args": [
+        [
+          9,
+          8,
+          7
+        ]
+      ],
+      "expected": [
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          2,
+          3,
+          3,
+          3
+        ]
+      ],
+      "expected": [
+        3,
+        3,
+        3,
+        2,
+        2,
+        1
+      ]
+    },
+    {
+      "args": [
+        [
+          0,
+          -5,
+          0,
+          -5,
+          -5,
+          10
+        ]
+      ],
+      "expected": [
+        -5,
+        -5,
+        -5,
+        0,
+        0,
+        10
+      ]
+    },
+    {
+      "args": [
+        [
+          4,
+          4,
+          1,
+          1,
+          2,
+          2,
+          3
+        ]
+      ],
+      "expected": [
+        1,
+        1,
+        2,
+        2,
+        4,
+        4,
+        3
+      ]
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "First find out how often each value appears.",
+    "A dictionary (or collections.Counter) gives the counts; then sort with a custom key.",
+    "Sort with `key=lambda x: (-count[x], x)` so higher counts come first and ties go to the smaller value."
+  ],
+  "followUps": [
+    "Could you produce the answer without a comparison sort, using buckets indexed by count?"
+  ],
+  "complexity": {
+    "time": "O(n log n)",
+    "space": "O(n)"
+  }
+}

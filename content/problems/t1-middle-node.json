@@ -1,0 +1,329 @@
+{
+  "id": "t1-middle-node",
+  "version": 1,
+  "title": "Halfway Checkpoint",
+  "tier": "T1",
+  "difficulty": "easy",
+  "folder": "data-structures",
+  "topic": "linked-list",
+  "tags": [
+    "linked-list",
+    "two-pointers"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "A delivery route is stored as a linked list of stops. The driver wants to start from the middle.\n\nGiven the `head` of a non-empty singly linked list, return the **middle node** (the list from that node to the end). If there are two middle nodes, return the **second** one.\n\nLinked lists are passed as a `ListNode` (with `.val` and `.next`; the class is already defined for you). In examples a list is written as its values, for example `[1, 2, 3]`, and `[]` means `None`.",
+  "function": {
+    "name": "middle_node",
+    "params": [
+      {
+        "name": "head",
+        "type": "ListNode"
+      }
+    ],
+    "returns": "ListNode"
+  },
+  "constraints": [
+    "1 <= number of nodes <= 1000"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      ],
+      "expected": [
+        3,
+        4,
+        5
+      ],
+      "explanation": "The middle of five nodes is the third."
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          3,
+          4
+        ]
+      ],
+      "expected": [
+        3,
+        4
+      ],
+      "explanation": "With two middles (2 and 3), return the second."
+    }
+  ],
+  "starter": {
+    "python": "def middle_node(head):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          9
+        ]
+      ],
+      "expected": [
+        9
+      ]
+    },
+    {
+      "args": [
+        [
+          4,
+          8
+        ]
+      ],
+      "expected": [
+        8
+      ]
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ]
+      ],
+      "expected": [
+        2,
+        3
+      ]
+    },
+    {
+      "args": [
+        [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60
+        ]
+      ],
+      "expected": [
+        40,
+        50,
+        60
+      ]
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99
+        ]
+      ],
+      "expected": [
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99
+      ]
+    },
+    {
+      "args": [
+        [
+          0,
+          0,
+          0,
+          1
+        ]
+      ],
+      "expected": [
+        0,
+        1
+      ]
+    },
+    {
+      "args": [
+        [
+          -2,
+          -1
+        ]
+      ],
+      "expected": [
+        -1
+      ]
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "You could count the nodes first, but there is a one-pass trick.",
+    "Use two pointers moving at different speeds.",
+    "Move slow one step and fast two steps while fast and fast.next exist. When fast stops, slow is at the (second) middle."
+  ],
+  "followUps": [
+    "How would you return the first middle instead of the second?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(1)"
+  }
+}

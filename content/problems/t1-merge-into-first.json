@@ -1,0 +1,285 @@
+{
+  "id": "t1-merge-into-first",
+  "version": 1,
+  "title": "Fill the Spare Slots",
+  "tier": "T1",
+  "difficulty": "easy",
+  "folder": "basics",
+  "topic": "merging",
+  "tags": [
+    "arrays",
+    "two-pointers",
+    "merge"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "Memory is tight on the school server, so the merge has to reuse the first buffer.\n\nList `a` has length `m + n`: its first `m` values are sorted and real, and the last `n` slots are `0` placeholders. List `b` holds `n` sorted values. Fill `a` so it contains all `m + n` values in sorted order and **return `a`**. Try to do it in place by filling from the back.",
+  "function": {
+    "name": "merge_into",
+    "params": [
+      {
+        "name": "a",
+        "type": "list[int]"
+      },
+      {
+        "name": "m",
+        "type": "int"
+      },
+      {
+        "name": "b",
+        "type": "list[int]"
+      },
+      {
+        "name": "n",
+        "type": "int"
+      }
+    ],
+    "returns": "list[int]"
+  },
+  "constraints": [
+    "len(a) == m + n",
+    "len(b) == n",
+    "0 <= m, n <= 10^4",
+    "the real part of a and all of b are sorted"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          1,
+          4,
+          6,
+          0,
+          0
+        ],
+        3,
+        [
+          2,
+          5
+        ],
+        2
+      ],
+      "expected": [
+        1,
+        2,
+        4,
+        5,
+        6
+      ],
+      "explanation": "The placeholders are replaced and everything ends up in order."
+    },
+    {
+      "args": [
+        [
+          0,
+          0
+        ],
+        0,
+        [
+          3,
+          8
+        ],
+        2
+      ],
+      "expected": [
+        3,
+        8
+      ],
+      "explanation": "a has no real values, so the result is just b."
+    }
+  ],
+  "starter": {
+    "python": "def merge_into(a, m, b, n):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          2,
+          3
+        ],
+        2,
+        [],
+        0
+      ],
+      "expected": [
+        2,
+        3
+      ]
+    },
+    {
+      "args": [
+        [
+          5,
+          0
+        ],
+        1,
+        [
+          1
+        ],
+        1
+      ],
+      "expected": [
+        1,
+        5
+      ]
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [],
+        0,
+        [],
+        0
+      ],
+      "expected": []
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          3,
+          0,
+          0,
+          0
+        ],
+        3,
+        [
+          4,
+          5,
+          6
+        ],
+        3
+      ],
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "args": [
+        [
+          4,
+          5,
+          6,
+          0,
+          0,
+          0
+        ],
+        3,
+        [
+          1,
+          2,
+          3
+        ],
+        3
+      ],
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "args": [
+        [
+          1,
+          1,
+          0,
+          0
+        ],
+        2,
+        [
+          1,
+          1
+        ],
+        2
+      ],
+      "expected": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "args": [
+        [
+          -5,
+          0,
+          0,
+          0
+        ],
+        1,
+        [
+          -6,
+          -5,
+          9
+        ],
+        3
+      ],
+      "expected": [
+        -6,
+        -5,
+        -5,
+        9
+      ]
+    },
+    {
+      "args": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        3,
+        [
+          0
+        ],
+        1
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Filling from the front would overwrite values you still need.",
+    "The largest remaining value is always at the end of a's real part or the end of b.",
+    "Keep pointers i = m-1, j = n-1, k = m+n-1; write the bigger of a[i] and b[j] into a[k] and step back. When i runs out, copy what is left of b."
+  ],
+  "followUps": [
+    "Why do you never need to copy leftover values from a?"
+  ],
+  "complexity": {
+    "time": "O(m + n)",
+    "space": "O(1)"
+  }
+}

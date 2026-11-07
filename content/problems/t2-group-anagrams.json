@@ -1,0 +1,235 @@
+{
+  "id": "t2-group-anagrams",
+  "version": 1,
+  "title": "Scrambled Tags",
+  "tier": "T2",
+  "difficulty": "medium",
+  "folder": "data-structures",
+  "topic": "hash-map",
+  "tags": [
+    "hash-map",
+    "strings",
+    "sorting"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "Students typed project tags with letters in random order. Group tags that use exactly the same letters.\n\nGiven a list of lowercase strings `words`, group the words that are **anagrams** of each other (same letters, same counts). Return a list of groups. **Inside each group, sort the words alphabetically.** The groups themselves can be in any order. Duplicate words stay in their group.",
+  "function": {
+    "name": "group_anagrams",
+    "params": [
+      {
+        "name": "words",
+        "type": "list[str]"
+      }
+    ],
+    "returns": "list[list[str]]"
+  },
+  "constraints": [
+    "0 <= len(words) <= 10^4",
+    "0 <= len(words[i]) <= 100",
+    "words contain only a-z"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          "listen",
+          "tab",
+          "silent",
+          "bat",
+          "cat"
+        ]
+      ],
+      "expected": [
+        [
+          "listen",
+          "silent"
+        ],
+        [
+          "bat",
+          "tab"
+        ],
+        [
+          "cat"
+        ]
+      ],
+      "explanation": "listen/silent and tab/bat share letters; cat is alone."
+    },
+    {
+      "args": [
+        [
+          ""
+        ]
+      ],
+      "expected": [
+        [
+          ""
+        ]
+      ],
+      "explanation": "An empty string forms its own group."
+    }
+  ],
+  "starter": {
+    "python": "def group_anagrams(words):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          "a"
+        ]
+      ],
+      "expected": [
+        [
+          "a"
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          "ab",
+          "ba",
+          "ab"
+        ]
+      ],
+      "expected": [
+        [
+          "ab",
+          "ab",
+          "ba"
+        ]
+      ]
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        []
+      ],
+      "expected": []
+    },
+    {
+      "args": [
+        [
+          "abc",
+          "def"
+        ]
+      ],
+      "expected": [
+        [
+          "abc"
+        ],
+        [
+          "def"
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          "race",
+          "care",
+          "acre",
+          "ecar",
+          "x"
+        ]
+      ],
+      "expected": [
+        [
+          "acre",
+          "care",
+          "ecar",
+          "race"
+        ],
+        [
+          "x"
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          "",
+          "",
+          "b"
+        ]
+      ],
+      "expected": [
+        [
+          "",
+          ""
+        ],
+        [
+          "b"
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          "aab",
+          "aba",
+          "abb",
+          "bab",
+          "bba"
+        ]
+      ],
+      "expected": [
+        [
+          "aab",
+          "aba"
+        ],
+        [
+          "abb",
+          "bab",
+          "bba"
+        ]
+      ]
+    },
+    {
+      "args": [
+        [
+          "zz",
+          "z",
+          "zz"
+        ]
+      ],
+      "expected": [
+        [
+          "zz",
+          "zz"
+        ],
+        [
+          "z"
+        ]
+      ]
+    }
+  ],
+  "compare": "unordered",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Two words are anagrams when they look the same after some canonical rearrangement.",
+    "Use that canonical form as a dictionary key.",
+    "Key each word by ''.join(sorted(word)) (or a tuple of 26 letter counts), append it to groups[key], then return [sorted(g) for g in groups.values()]."
+  ],
+  "followUps": [
+    "Why might a letter-count key be faster than sorting each word for very long words?"
+  ],
+  "complexity": {
+    "time": "O(n * k log k)",
+    "space": "O(n * k)"
+  }
+}

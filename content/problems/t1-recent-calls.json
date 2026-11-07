@@ -1,0 +1,214 @@
+{
+  "id": "t1-recent-calls",
+  "version": 1,
+  "title": "Rate Limiter Window",
+  "tier": "T1",
+  "difficulty": "easy",
+  "folder": "data-structures",
+  "topic": "queue",
+  "tags": [
+    "queue",
+    "sliding-window"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "The API gateway counts how busy it is over the last three seconds.\n\nGiven `times`, a list of request timestamps in milliseconds in **strictly increasing** order, return a list where entry `i` is the number of requests whose time is in the range `[times[i] - 3000, times[i]]` (both ends included), counting request `i` itself.",
+  "function": {
+    "name": "count_recent",
+    "params": [
+      {
+        "name": "times",
+        "type": "list[int]"
+      }
+    ],
+    "returns": "list[int]"
+  },
+  "constraints": [
+    "0 <= len(times) <= 10^5",
+    "1 <= times[i] <= 10^9",
+    "times is strictly increasing"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          1,
+          100,
+          3001,
+          3002
+        ]
+      ],
+      "expected": [
+        1,
+        2,
+        3,
+        3
+      ],
+      "explanation": "At 3001 the window [1, 3001] holds 3 requests; at 3002 the request at 1 has dropped out."
+    },
+    {
+      "args": [
+        [
+          5000
+        ]
+      ],
+      "expected": [
+        1
+      ],
+      "explanation": "A single request counts itself."
+    }
+  ],
+  "starter": {
+    "python": "def count_recent(times):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ]
+      ],
+      "expected": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "args": [
+        [
+          1,
+          4000,
+          8000
+        ]
+      ],
+      "expected": [
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        []
+      ],
+      "expected": []
+    },
+    {
+      "args": [
+        [
+          1000,
+          4000
+        ]
+      ],
+      "expected": [
+        1,
+        2
+      ]
+    },
+    {
+      "args": [
+        [
+          1000,
+          4001
+        ]
+      ],
+      "expected": [
+        1,
+        1
+      ]
+    },
+    {
+      "args": [
+        [
+          1,
+          1001,
+          2001,
+          3001,
+          4001,
+          5001,
+          6001,
+          7001,
+          8001,
+          9001
+        ]
+      ],
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "args": [
+        [
+          10,
+          20,
+          3010,
+          3011,
+          6020
+        ]
+      ],
+      "expected": [
+        1,
+        2,
+        3,
+        3,
+        1
+      ]
+    },
+    {
+      "args": [
+        [
+          1,
+          3001,
+          6001,
+          9001
+        ]
+      ],
+      "expected": [
+        1,
+        2,
+        2,
+        2
+      ]
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Old requests leave the window in the same order they arrived.",
+    "A queue of timestamps works: add at the back, drop from the front.",
+    "For each t, append t, then pop from the front while the front is < t - 3000. The queue length is the answer for t. collections.deque gives O(1) pops from the left."
+  ],
+  "followUps": [
+    "How would you handle timestamps that can arrive slightly out of order?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(n)"
+  }
+}

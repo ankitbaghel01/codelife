@@ -1,0 +1,135 @@
+{
+  "id": "t1-most-frequent-char",
+  "version": 1,
+  "title": "Loudest Letter",
+  "tier": "T1",
+  "difficulty": "easy",
+  "folder": "data-structures",
+  "topic": "hash-map",
+  "tags": [
+    "strings",
+    "hash-map",
+    "counting"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "Marketing wants to know which character shows up most in a slogan.\n\nGiven `text`, return the character that appears **most often**, ignoring spaces. Matching is **case-sensitive** (`'a'` and `'A'` are different). If several characters tie, return the one that **appears first** in `text`.",
+  "function": {
+    "name": "most_frequent_char",
+    "params": [
+      {
+        "name": "text",
+        "type": "str"
+      }
+    ],
+    "returns": "str"
+  },
+  "constraints": [
+    "1 <= len(text) <= 10^5",
+    "text contains at least one non-space character"
+  ],
+  "examples": [
+    {
+      "args": [
+        "banana"
+      ],
+      "expected": "a",
+      "explanation": "'a' appears 3 times, 'n' twice, 'b' once."
+    },
+    {
+      "args": [
+        "abcabc"
+      ],
+      "expected": "a",
+      "explanation": "All three tie at 2; 'a' appears first."
+    }
+  ],
+  "starter": {
+    "python": "def most_frequent_char(text):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        "hello world"
+      ],
+      "expected": "l"
+    },
+    {
+      "args": [
+        "zzy y"
+      ],
+      "expected": "z"
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        "q"
+      ],
+      "expected": "q"
+    },
+    {
+      "args": [
+        "  x  "
+      ],
+      "expected": "x"
+    },
+    {
+      "args": [
+        "aAbBb"
+      ],
+      "expected": "b"
+    },
+    {
+      "args": [
+        "mississippi"
+      ],
+      "expected": "i"
+    },
+    {
+      "args": [
+        "112233"
+      ],
+      "expected": "1"
+    },
+    {
+      "args": [
+        "the cat sat on the mat"
+      ],
+      "expected": "t"
+    },
+    {
+      "args": [
+        "ababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababb"
+      ],
+      "expected": "b"
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "You need to know how many times each character appears.",
+    "A dictionary (or collections.Counter) mapping character -> count works well.",
+    "Count everything except spaces, then scan text from the left and keep the first character with the max count."
+  ],
+  "followUps": [
+    "How would you return the top k most frequent characters?",
+    "If the input only had lowercase letters, could you avoid a dictionary?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(k) for k distinct characters"
+  }
+}

@@ -1,0 +1,459 @@
+{
+  "id": "t2-queue-two-stacks",
+  "version": 1,
+  "title": "Print Queue from Stacks",
+  "tier": "T2",
+  "difficulty": "medium",
+  "folder": "data-structures",
+  "topic": "queue",
+  "tags": [
+    "queue",
+    "stack",
+    "design"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "The office printer firmware only gives you stacks (Python lists with `append` and `pop`), but jobs must print first-in, first-out.\n\nBuild a queue out of **two stacks** and use it to process `ops`, a list of operations:\n\n- `[\"push\", x]` adds `x` to the back (no output)\n- `[\"pop\"]` removes the front value and outputs it\n- `[\"peek\"]` outputs the front value without removing it\n- `[\"empty\"]` outputs `True` if the queue is empty, else `False`\n\nReturn the list of outputs in order. `pop` and `peek` are never called on an empty queue. Do not use `collections.deque` or `list.pop(0)`.",
+  "function": {
+    "name": "process_queue",
+    "params": [
+      {
+        "name": "ops",
+        "type": "list[list]"
+      }
+    ],
+    "returns": "list"
+  },
+  "constraints": [
+    "1 <= len(ops) <= 10^4",
+    "-10^6 <= x <= 10^6"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          [
+            "push",
+            1
+          ],
+          [
+            "push",
+            2
+          ],
+          [
+            "peek"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "empty"
+          ]
+        ]
+      ],
+      "expected": [
+        1,
+        1,
+        false
+      ],
+      "explanation": "Front is 1; after popping it, 2 is still queued."
+    },
+    {
+      "args": [
+        [
+          [
+            "empty"
+          ],
+          [
+            "push",
+            5
+          ],
+          [
+            "pop"
+          ],
+          [
+            "empty"
+          ]
+        ]
+      ],
+      "expected": [
+        true,
+        5,
+        true
+      ],
+      "explanation": "The queue starts and ends empty."
+    }
+  ],
+  "starter": {
+    "python": "def process_queue(ops):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [
+          [
+            "push",
+            3
+          ],
+          [
+            "push",
+            4
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ]
+        ]
+      ],
+      "expected": [
+        3,
+        4
+      ]
+    },
+    {
+      "args": [
+        [
+          [
+            "push",
+            9
+          ],
+          [
+            "peek"
+          ],
+          [
+            "peek"
+          ]
+        ]
+      ],
+      "expected": [
+        9,
+        9
+      ]
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [
+          [
+            "push",
+            1
+          ]
+        ]
+      ],
+      "expected": []
+    },
+    {
+      "args": [
+        [
+          [
+            "push",
+            1
+          ],
+          [
+            "push",
+            2
+          ],
+          [
+            "pop"
+          ],
+          [
+            "push",
+            3
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "empty"
+          ]
+        ]
+      ],
+      "expected": [
+        1,
+        2,
+        3,
+        true
+      ]
+    },
+    {
+      "args": [
+        [
+          [
+            "push",
+            -1
+          ],
+          [
+            "push",
+            0
+          ],
+          [
+            "peek"
+          ],
+          [
+            "push",
+            1
+          ],
+          [
+            "pop"
+          ],
+          [
+            "peek"
+          ]
+        ]
+      ],
+      "expected": [
+        -1,
+        -1,
+        0
+      ]
+    },
+    {
+      "args": [
+        [
+          [
+            "push",
+            0
+          ],
+          [
+            "push",
+            1
+          ],
+          [
+            "push",
+            2
+          ],
+          [
+            "push",
+            3
+          ],
+          [
+            "push",
+            4
+          ],
+          [
+            "push",
+            5
+          ],
+          [
+            "push",
+            6
+          ],
+          [
+            "push",
+            7
+          ],
+          [
+            "push",
+            8
+          ],
+          [
+            "push",
+            9
+          ],
+          [
+            "push",
+            10
+          ],
+          [
+            "push",
+            11
+          ],
+          [
+            "push",
+            12
+          ],
+          [
+            "push",
+            13
+          ],
+          [
+            "push",
+            14
+          ],
+          [
+            "push",
+            15
+          ],
+          [
+            "push",
+            16
+          ],
+          [
+            "push",
+            17
+          ],
+          [
+            "push",
+            18
+          ],
+          [
+            "push",
+            19
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "pop"
+          ],
+          [
+            "empty"
+          ]
+        ]
+      ],
+      "expected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        true
+      ]
+    },
+    {
+      "args": [
+        [
+          [
+            "empty"
+          ],
+          [
+            "empty"
+          ]
+        ]
+      ],
+      "expected": [
+        true,
+        true
+      ]
+    },
+    {
+      "args": [
+        [
+          [
+            "push",
+            7
+          ],
+          [
+            "pop"
+          ],
+          [
+            "push",
+            8
+          ],
+          [
+            "peek"
+          ],
+          [
+            "empty"
+          ]
+        ]
+      ],
+      "expected": [
+        7,
+        8,
+        false
+      ]
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "A stack reverses order; reversing twice gives the original order back.",
+    "Push into an 'in' stack. Serve pop/peek from an 'out' stack.",
+    "Only when 'out' is empty, move everything from 'in' to 'out' (pop from one, append to the other). Each value moves at most once, so the cost is O(1) amortised."
+  ],
+  "followUps": [
+    "Can you build a stack using only queue operations?"
+  ],
+  "complexity": {
+    "time": "O(1) amortised per operation",
+    "space": "O(n)"
+  }
+}

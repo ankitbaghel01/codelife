@@ -7,6 +7,7 @@ import {
   canAttend,
   findRole,
   goToWork,
+  whyCantWork,
   promote,
   interviewOutcome,
   practiceSolved,
@@ -194,6 +195,16 @@ test("work shifts: start day, hours, once a day, energy", () => {
   assert.equal(w.state.job.daysWorked, 1);
   assert.equal(w.state.minute, 17 * 60);
   assert.match(goToWork(w.state).error, /already/);
+});
+test("work: arriving early waits for 09:00; too late is refused with a reason", () => {
+  let g = tick(sleep(sleep(interviewOutcome(newGame("A"), "x", offer, true))), 30); // day 3, 07:30
+  assert.equal(whyCantWork(g), null);
+  const w = goToWork(g);
+  assert.equal(w.error, undefined);
+  assert.equal(w.state.minute, 17 * 60); // waited until 09:00, then an 8-hour shift
+  g = tick(g, 10 * 60); // 17:30
+  assert.match(whyCantWork(g), /closed/);
+  assert.match(goToWork(g).error, /closed/);
 });
 test("payday is pro-rated by days worked; rent is charged on day 30", () => {
   let g = interviewOutcome(newGame("A"), "x", offer, true); // job from day 3

@@ -10,6 +10,7 @@ import {
   findCompany,
   fmtTime,
   goToWork,
+  whyCantWork,
   interviewOutcome,
   newGame,
   practiceSolved,
@@ -264,6 +265,7 @@ export default function App() {
               minute={game.minute}
               invitations={game.invitations}
               job={game.job}
+              workWhy={whyCantWork(tick(game, travel))}
               onGo={goPlace}
               onClose={() => setPlace({ kind: "home" })}
             />

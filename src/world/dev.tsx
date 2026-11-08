@@ -69,6 +69,7 @@ export function WorldDev() {
           minute={9 * 60 + 40}
           invitations={SAMPLE_INVITES}
           job={null}
+          workWhy={null}
           onGo={(id) => {
             const c = id.startsWith("company:") ? id.slice(8) : "";
             if (c === "sutradhar" || c === "kiranacart") {

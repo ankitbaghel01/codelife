@@ -497,21 +497,25 @@ export function interviewOutcome(
   return g;
 }
 
-/** A work shift at your company: costs time and energy, counts towards this month's pay, builds experience. */
-export function goToWork(s: GameState): Result {
+/** Why you can't start a shift on arrival at state [s], or null when you can. Shared by the city map and [goToWork]. */
+export function whyCantWork(s: GameState): string | null {
   const j = s.job;
-  if (!j) return { state: s, error: "You don't have a job yet." };
-  if (s.day < j.startDay)
-    return { state: s, error: `You start on Day ${j.startDay}.` };
-  if (j.lastWorkedDay === s.day)
-    return { state: s, error: "You've already worked today." };
-  if (
-    s.minute < CONFIG.work.startMinute ||
-    s.minute > CONFIG.work.endMinute - 60
-  )
-    return { state: s, error: "Your shift starts between 09:00 and 17:00." };
-  if (s.energy < CONFIG.work.energyCost)
-    return { state: s, error: "You're too tired to work. Sleep first." };
+  if (!j) return "You don't have a job yet.";
+  if (s.day < j.startDay) return `You start on Day ${j.startDay}.`;
+  if (j.lastWorkedDay === s.day) return "You've already worked today. Come back tomorrow.";
+  if (s.minute > CONFIG.work.endMinute - 60)
+    return "Your office is closed for today. A shift has to start by 17:00 (the bus takes 30 min).";
+  if (s.energy < CONFIG.work.energyCost) return "You're too tired to work. Sleep first.";
+  return null;
+}
+
+/** A work shift at your company: costs time and energy, counts towards this month's pay, builds experience.
+ * Arriving before 09:00 is fine: you wait at the office until the shift starts. */
+export function goToWork(s0: GameState): Result {
+  const why = whyCantWork(s0);
+  if (why) return { state: s0, error: why };
+  const s = s0.minute < CONFIG.work.startMinute ? tick(s0, CONFIG.work.startMinute - s0.minute) : s0;
+  const j = s.job!;
   let g = tick(
     { ...s, job: { ...j, daysWorked: j.daysWorked + 1, totalDaysWorked: j.totalDaysWorked + 1, lastWorkedDay: s.day } },
     CONFIG.work.shiftMinutes,

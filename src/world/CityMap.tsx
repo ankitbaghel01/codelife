@@ -18,6 +18,8 @@ type Props = {
   minute: number;
   invitations: Invitation[];
   job: Job;
+  /** Why a shift can't start if you leave now (null = you can work). */
+  workWhy: string | null;
   onGo: (placeId: string) => void;
   onClose: () => void;
 };
@@ -115,6 +117,7 @@ function statusOf(
   minute: number,
   invitations: Invitation[],
   job: Job,
+  workWhy: string | null,
 ): Status {
   if (p.soon) return { canGo: false, why: p.soon, doNow: "Nothing yet." };
   if (!p.company)
@@ -128,8 +131,8 @@ function statusOf(
     return {
       badge: "Your workplace",
       tone: "work",
-      canGo: true,
-      why: "",
+      canGo: !workWhy,
+      why: workWhy ?? "",
       doNow: `Go to work as ${job.title}.`,
     };
   const live = invitations.filter(
@@ -173,6 +176,7 @@ export function CityMap({
   minute,
   invitations,
   job,
+  workWhy,
   onGo,
   onClose,
 }: Props) {
@@ -181,9 +185,9 @@ export function CityMap({
   const statuses = useMemo(
     () =>
       new Map(
-        PLACES.map((p) => [p.id, statusOf(p, day, minute, invitations, job)]),
+        PLACES.map((p) => [p.id, statusOf(p, day, minute, invitations, job, workWhy)]),
       ),
-    [day, minute, invitations, job],
+    [day, minute, invitations, job, workWhy],
   );
   const place = PLACES.find((p) => p.id === sel);
   const st = place && statuses.get(place.id)!;

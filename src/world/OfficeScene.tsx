@@ -34,8 +34,8 @@ import type { Company, Interviewer } from "./companies";
 const NPC = "/assets/npc";
 // Which Rocketbox avatar plays each interviewer gender (fetched by scripts/fetch_assets.py).
 const AVATAR = {
-  male: { fbx: "Male_Adult_08", anim: "m_sit", height: 1.78 },
-  female: { fbx: "Female_Adult_02", anim: "f_sit", height: 1.66 },
+  male: { fbx: "Male_Adult_04", anim: "m_sit", height: 1.76 },
+  female: { fbx: "Female_Adult_11", anim: "f_sit", height: 1.62 },
 };
 
 // Rocketbox FBX files point at 12 MB .tga textures; serve the small JPG/PNG copies instead.

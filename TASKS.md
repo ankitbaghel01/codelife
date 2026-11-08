@@ -55,6 +55,8 @@ Tracks the phases in the PRD (`LIFE_exe_Game_PRD_and_Claude_Code_Prompt.md`, sec
 - [x] HUD only in the apartment; workstation title readable at laptop widths
 - [ ] Real sandbox: deploy Judge0 on a Linux VM (the dev executor is not isolated)
 - [ ] Test with a real Claude API key
-- [ ] Indian-looking characters and city view, newer laptop model, asset compression
-- [ ] Library and café, more companies and roles, promotions
+- [x] Interviewers swapped to the most South Asian-looking Rocketbox avatars (Male_Adult_04, Female_Adult_11)
+- [ ] Indian city view outside the windows, newer laptop model, asset compression
+- [x] Promotions: every 20 days worked, Problem solving 35/50/65/80+ → next level, +15% salary (performance review message otherwise)
+- [ ] Library and café, more companies and roles
 - [ ] Narrow-screen layouts, end-to-end test automation

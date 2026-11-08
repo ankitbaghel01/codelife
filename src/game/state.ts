@@ -41,6 +41,8 @@ export type Job = {
   startDay: number;
   daysWorked: number; // since the last payday
   lastWorkedDay: number;
+  level: number; // 1 at joining; promotions raise it
+  totalDaysWorked: number;
 };
 export type Evidence = {
   day: number;
@@ -474,6 +476,8 @@ export function interviewOutcome(
         startDay: g.day + offer.joinInDays,
         daysWorked: 0,
         lastWorkedDay: 0,
+        level: 1,
+        totalDaysWorked: 0,
       },
     };
     g = addMessage(
@@ -509,13 +513,41 @@ export function goToWork(s: GameState): Result {
   if (s.energy < CONFIG.work.energyCost)
     return { state: s, error: "You're too tired to work. Sleep first." };
   let g = tick(
-    { ...s, job: { ...j, daysWorked: j.daysWorked + 1, lastWorkedDay: s.day } },
+    { ...s, job: { ...j, daysWorked: j.daysWorked + 1, totalDaysWorked: j.totalDaysWorked + 1, lastWorkedDay: s.day } },
     CONFIG.work.shiftMinutes,
   );
   g = { ...g, energy: clamp(g.energy - CONFIG.work.energyCost) };
   g = raise(g, "Problem solving", 0.5, "A day of real work");
   g = raise(g, "Communication", 0.5, "A day of real work");
-  return { state: g };
+  return { state: promote(g) };
+}
+
+/** Every N days worked, a good enough problem solver is promoted: higher level, title and salary. */
+export function promote(s: GameState): GameState {
+  const j = s.job;
+  const w = CONFIG.work;
+  if (!j || j.totalDaysWorked === 0 || j.totalDaysWorked % w.promotionEveryDays !== 0) return s;
+  const need = w.promotionMinSkill[Math.min(j.level - 1, w.promotionMinSkill.length - 1)];
+  const skill = s.skills.find((k) => k.name === "Problem solving")?.proficiency ?? 0;
+  const company = findCompany(j.companyId)?.name ?? "Your manager";
+  if (skill < need) {
+    return addMessage(
+      s,
+      `promo-review-${j.totalDaysWorked}`,
+      company,
+      `Performance review: good work, but a promotion needs Problem solving ${need}+ (you have ${Math.floor(skill)}). Keep practising.`,
+    );
+  }
+  const level = j.level + 1;
+  const monthlySalary = Math.round((j.monthlySalary * (1 + w.promotionRaise)) / 100) * 100;
+  const title = `${j.title.replace(/ \(Level \d+\)$/, "")} (Level ${level})`;
+  const g = { ...s, job: { ...j, level, monthlySalary, title } };
+  return addMessage(
+    g,
+    `promo-${j.totalDaysWorked}`,
+    company,
+    `Congratulations! You're promoted to ${title}. New salary: ₹${monthlySalary.toLocaleString("en-IN")} a month.`,
+  );
 }
 
 // ---------- Saves ----------
@@ -557,7 +589,7 @@ export function parseSave(raw: string | null): GameState | null {
           ? v.resume
           : { summary: "", projects: [] },
       invitations: v.invitations ?? [],
-      job: v.job ?? null,
+      job: v.job ? { level: 1, totalDaysWorked: 0, ...v.job } : null,
       solved: v.solved ?? [],
       evidence: Array.isArray(v.evidence) ? v.evidence : [],
     } as GameState;

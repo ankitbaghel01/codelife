@@ -56,7 +56,7 @@ ANIMS = {
 }
 
 # Interviewer NPCs (src/world/OfficeScene.tsx): avatar folder -> texture prefix, plus seated idle animations.
-NPCS = {"Male_Adult_08": "m014", "Female_Adult_02": "f002"}
+NPCS = {"Male_Adult_04": "m006", "Female_Adult_11": "f011"}  # chosen to look South Asian
 NPC_ANIMS = {
     "m_sit": "Animations/all_animations_max_motextr_static/m_sit_chair_idle_neutral_01.max.fbx",
     "f_sit": "Animations/all_animations_max_motextr_static/f_sit_chair_idle_neutral_01.max.fbx",

@@ -25,7 +25,17 @@ export const CONFIG = {
   travelMinutes: 30, // bus ride between home and anywhere in the city
   rentEvery: 30, // days; the landlord's message says rent is due on day 30
   interview: { minute: 11 * 60, cooldownDays: 7 },
-  work: { startMinute: 9 * 60, endMinute: 18 * 60, shiftMinutes: 8 * 60, energyCost: 35, fullMonthDays: 20 },
+  work: {
+    startMinute: 9 * 60,
+    endMinute: 18 * 60,
+    shiftMinutes: 8 * 60,
+    energyCost: 35,
+    fullMonthDays: 20,
+    promotionEveryDays: 20,
+    promotionRaise: 0.15,
+    // Problem solving needed to move up from level 1, 2, 3 (a fourth promotion needs 80).
+    promotionMinSkill: [35, 50, 65, 80],
+  },
   practiceGain: { easy: 2, medium: 4, hard: 6 } as Record<string, number>,
   rates: {
     hungerPerHour: 5, // hunger rises 0 → 100

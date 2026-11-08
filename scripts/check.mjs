@@ -7,6 +7,7 @@ import {
   canAttend,
   findRole,
   goToWork,
+  promote,
   interviewOutcome,
   practiceSolved,
   qualifies,
@@ -209,5 +210,23 @@ test("old saves without the new fields still load", () => {
   assert.deepEqual([g.invitations, g.solved, g.job], [[], [], null]);
 });
 
+
+test("promotion after 20 days worked needs enough problem solving", () => {
+  let g = interviewOutcome(newGame("A"), "x", offer, true);
+  g = { ...g, job: { ...g.job, totalDaysWorked: 20 } };
+  const low = promote(g); // Problem solving 20 < 35
+  assert.equal(low.job.level, 1);
+  assert.match(low.messages.at(-1).text, /needs Problem solving 35/);
+  const ps = { ...g, skills: g.skills.map((k) => (k.name === "Problem solving" ? { ...k, proficiency: 40 } : k)) };
+  const up = promote(ps);
+  assert.deepEqual([up.job.level, up.job.monthlySalary, up.job.title], [2, 29900, "Junior Web Developer (Level 2)"]);
+  assert.equal(promote({ ...ps, job: { ...ps.job, totalDaysWorked: 21 } }).job.level, 1); // only on every 20th day
+});
+test("old saves with a job get a level", () => {
+  const g = interviewOutcome(newGame("A"), "x", offer, true);
+  const { level, totalDaysWorked, ...oldJob } = g.job;
+  const back = parseSave(JSON.stringify({ ...g, job: oldJob }));
+  assert.deepEqual([back.job.level, back.job.totalDaysWorked], [1, 0]);
+});
 
 console.log(`\n${n} checks passed`);

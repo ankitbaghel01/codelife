@@ -7,6 +7,14 @@ import {
   canAttend,
   findRole,
   goToWork,
+  finishShift,
+  workTasks,
+  workTaskSolved,
+  tripsWaiting,
+  takeTrip,
+  catchUp,
+  isWorkday,
+  nextWorkday,
   whyCantWork,
   promote,
   interviewOutcome,
@@ -193,18 +201,89 @@ test("work shifts: start day, hours, once a day, energy", () => {
   const w = goToWork(g);
   assert.equal(w.error, undefined);
   assert.equal(w.state.job.daysWorked, 1);
-  assert.equal(w.state.minute, 17 * 60);
+  assert.equal(w.state.minute, 9 * 60); // clocked in; you stay until you leave
   assert.match(goToWork(w.state).error, /already/);
+  const out = finishShift(w.state, w.state.minute);
+  assert.equal(out.minute, 17 * 60);
+  assert.ok(out.energy < w.state.energy);
+  assert.equal(finishShift(tick(w.state, 9 * 60), 9 * 60).minute, 18 * 60); // stayed late: no extra time
 });
 test("work: arriving early waits for 09:00; too late is refused with a reason", () => {
   let g = tick(sleep(sleep(interviewOutcome(newGame("A"), "x", offer, true))), 30); // day 3, 07:30
   assert.equal(whyCantWork(g), null);
   const w = goToWork(g);
   assert.equal(w.error, undefined);
-  assert.equal(w.state.minute, 17 * 60); // waited until 09:00, then an 8-hour shift
+  assert.equal(w.state.minute, 9 * 60); // waited until 09:00
   g = tick(g, 10 * 60); // 17:30
   assert.match(whyCantWork(g), /closed/);
   assert.match(goToWork(g).error, /closed/);
+});
+test("work tasks: 3 a day, paid once, stable through the day, new ones tomorrow", () => {
+  const ids = Array.from({ length: 40 }, (_, i) => `p${i}`);
+  let g = goToWork(tick(sleep(sleep(interviewOutcome(newGame("A"), "x", offer, true))), 90)).state;
+  const t = workTasks(g, ids);
+  assert.equal(t.length, 3);
+  const start = balance(g);
+  g = workTaskSolved(g, { id: t[1], title: "T", difficulty: "medium" });
+  assert.equal(balance(g) - start, 600);
+  assert.equal(workTaskSolved(g, { id: t[1], title: "T", difficulty: "medium" }), g); // paid once
+  assert.deepEqual(new Set(workTasks(g, ids)), new Set(t)); // same three tasks today
+  const tomorrow = workTasks(sleep(g), ids);
+  assert.equal(tomorrow.length, 3);
+  assert.ok(!tomorrow.includes(t[1]));
+});
+test("15 work tasks earn a bike trip; taking it rests you and uses it up", () => {
+  let g = interviewOutcome(newGame("A"), "x", offer, true);
+  for (let i = 0; i < 14; i++) g = workTaskSolved(g, { id: `p${i}`, title: "T", difficulty: "easy" });
+  assert.equal(tripsWaiting(g), 0);
+  assert.match(takeTrip(g).error, /trip/);
+  g = workTaskSolved(g, { id: "p14", title: "T", difficulty: "easy" });
+  assert.equal(tripsWaiting(g), 1);
+  assert.ok(g.messages.some((m) => /bike trip/.test(m.text)));
+  const r = takeTrip({ ...g, energy: 20 });
+  assert.equal(r.state.energy, 100);
+  assert.equal(tripsWaiting(r.state), 0);
+});
+test("leaving with unfinished tasks: they move to the next workday and pay half", () => {
+  const ids = Array.from({ length: 40 }, (_, i) => `p${i}`);
+  let g = goToWork(tick(sleep(sleep(interviewOutcome(newGame("A"), "x", offer, true))), 90)).state; // day 3
+  const t = workTasks(g, ids);
+  g = workTaskSolved(g, { id: t[0], title: "T", difficulty: "easy" });
+  g = finishShift(g, 9 * 60, [t[1], t[2]]);
+  g = goToWork(tick(sleep(g), 90)).state; // day 4
+  const next = workTasks(g, ids);
+  assert.deepEqual(next.slice(0, 2), [t[1], t[2]]); // late tasks first, plus one new
+  assert.equal(next.length, 3);
+  const start = balance(g);
+  g = workTaskSolved(g, { id: t[1], title: "T", difficulty: "hard" });
+  assert.equal(balance(g) - start, 500); // half of 1000
+  assert.ok(!g.job.carryOver.includes(t[1]));
+});
+test("a missed weekday is marked absent; weekends are off", () => {
+  let g = interviewOutcome(newGame("A"), "x", offer, true); // starts day 3 (Wednesday)
+  assert.ok(!isWorkday(6) && !isWorkday(7) && isWorkday(8));
+  while (g.day < 9) g = sleep(g); // misses days 3, 4, 5 and 8; 6-7 is the weekend
+  assert.deepEqual(g.job.absentDays, [3, 4, 5, 8]);
+  assert.ok(g.messages.some((m) => /absent on Day 3/.test(m.text)));
+  assert.ok(g.messages.some((m) => /Warning: 3 absences/.test(m.text)));
+  g = { ...g, day: 13 };
+  assert.match(goToWork({ ...sleep(g) }).error ?? "", /weekend/); // day 14 is a Sunday
+});
+test("next workday skips the evening and the weekend", () => {
+  assert.equal(nextWorkday(1, 8 * 60), 1); // Monday morning
+  assert.equal(nextWorkday(1, 21 * 60), 2); // Monday night → Tuesday
+  assert.equal(nextWorkday(5, 21 * 60), 8); // Friday night → Monday
+  assert.equal(nextWorkday(6, 10 * 60), 8); // Saturday → Monday
+});
+test("real days away pass in the game, capped at 30", () => {
+  const g = { ...newGame("A"), lastPlayed: "2026-11-01" };
+  assert.equal(catchUp(g, "2026-11-01").day, 1);
+  const r = catchUp(g, "2026-11-04");
+  assert.equal(r.day, 4);
+  assert.equal(r.lastPlayed, "2026-11-04");
+  assert.ok(r.messages.some((m) => /away for 3 days/.test(m.text)));
+  assert.equal(catchUp(g, "2027-03-01").day, 31);
+  assert.equal(catchUp(newGame("A"), "2026-11-04").day, 1); // first session: nothing to catch up
 });
 test("payday is pro-rated by days worked; rent is charged on day 30", () => {
   let g = interviewOutcome(newGame("A"), "x", offer, true); // job from day 3

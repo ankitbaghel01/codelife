@@ -298,3 +298,149 @@
     animation: none;
   }
 }
+
+/* Your desk at work (WorkDesk.tsx) */
+.workdesk {
+  place-items: center;
+  padding: 16px;
+}
+.workdesk .reception-card {
+  width: min(680px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+}
+.workdesk h2 {
+  margin: 4px 0 6px;
+}
+.workdesk-note {
+  color: var(--muted);
+  margin: 6px 0;
+}
+.workdesk-tasks {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  display: grid;
+  gap: 8px;
+}
+.workdesk-tasks button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 90px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.workdesk-tasks button:hover,
+.workdesk-tasks button:focus-visible {
+  border-color: var(--gold);
+}
+.workdesk-tasks button.done {
+  opacity: 0.7;
+}
+.workdesk-pay {
+  text-align: right;
+  color: var(--gold);
+  font-weight: 600;
+}
+.workdesk-trip {
+  margin: 14px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(242, 181, 68, 0.1);
+  border: 1px solid rgba(242, 181, 68, 0.35);
+}
+.workdesk-trip p {
+  margin: 0 0 6px;
+}
+.workdesk-meter {
+  height: 8px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.workdesk-meter span {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+}
+.lt.workdesk-ide {
+  padding: 0;
+  align-items: stretch;
+  background: #1b1714;
+}
+.workdesk-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--os-line);
+  color: var(--os-muted);
+}
+
+/* Company bike trip (BikeTrip.tsx) */
+.biketrip {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: #f4c98f;
+}
+.biketrip-hud {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--text);
+  max-width: calc(100% - 32px);
+}
+.biketrip-hud p {
+  margin: 2px 0;
+}
+.biketrip-help {
+  color: var(--muted);
+}
+.workdesk-late {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 12px;
+  background: rgba(240, 113, 103, 0.18);
+  color: var(--warn);
+}
+.workdesk-warn {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(240, 113, 103, 0.12);
+  border-left: 3px solid var(--warn);
+}
+
+/* After the company trip (App.tsx) */
+.vacation {
+  place-items: center;
+  background: radial-gradient(ellipse at 50% 30%, rgba(242, 181, 68, 0.25), rgba(20, 17, 15, 0.85));
+}
+.vacation h2 {
+  font-family: var(--display);
+  font-size: 44px;
+  letter-spacing: 0.02em;
+  margin: 6px 0 0;
+  color: var(--gold);
+}
+.vacation-next {
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+.vacation-next b {
+  color: var(--text);
+}

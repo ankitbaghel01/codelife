@@ -1,0 +1,610 @@
+/* Bike trip stunt ride: HUD, cards and touch controls. Uses the shared tokens from styles.css. */
+.bt {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  background: #f3c08f;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.bt kbd {
+  display: inline-block;
+  min-width: 1.7em;
+  padding: 1px 6px;
+  margin: 0 1px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  font: 600 12px/1.5 var(--mono);
+  text-align: center;
+  color: var(--text);
+}
+
+/* HUD grid: score | progress | time on top, speedo + help at the bottom */
+.bt-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  padding: 16px;
+}
+.bt-panel {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid rgba(74, 61, 49, 0.7);
+  color: var(--text);
+  backdrop-filter: blur(6px);
+  align-self: start;
+}
+.bt-score {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 170px;
+}
+.bt-score .eyebrow {
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+.bt-score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.bt-score-num {
+  font: 400 44px/1 var(--display);
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+}
+.bt-combo {
+  font: 400 30px/1 var(--display);
+  color: var(--ink);
+  background: var(--gold);
+  padding: 2px 8px 0;
+  border-radius: 8px;
+  animation: bt-pop 260ms ease-out;
+}
+.bt-combo-bar {
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.bt-combo-bar span {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  transform-origin: left;
+  transition: transform 100ms linear;
+}
+
+.bt-progress {
+  grid-column: 2;
+  justify-self: center;
+  width: min(520px, 100%);
+}
+.bt-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.bt-progress-labels span:nth-child(2) {
+  color: var(--text);
+}
+.bt-track {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.bt-track-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #d9472b, var(--gold));
+  transform-origin: left;
+  transition: transform 100ms linear;
+}
+.bt-tick {
+  position: absolute;
+  top: -4px;
+  width: 3px;
+  height: 16px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: var(--muted);
+}
+.bt-tick.passed {
+  background: var(--ok);
+}
+.bt-marker {
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: var(--text);
+  border: 3px solid #d9472b;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.25);
+  transition: left 100ms linear;
+}
+
+.bt-meta {
+  grid-column: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.bt-time {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+.bt-coins {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold);
+  font-weight: 700;
+}
+.bt-coins i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 35%,
+    #ffe7a3,
+    var(--gold) 60%,
+    #a86a00
+  );
+}
+
+/* Speedometer */
+.bt-speedo {
+  grid-column: 1;
+  grid-row: 3;
+  position: relative;
+  width: 132px;
+  height: 132px;
+  align-self: end;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 1px solid rgba(74, 61, 49, 0.7);
+  backdrop-filter: blur(6px);
+}
+.bt-speedo svg {
+  width: 100%;
+  height: 100%;
+}
+.bt-gauge-track,
+.bt-gauge-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+.bt-gauge-track {
+  stroke: rgba(255, 255, 255, 0.12);
+}
+.bt-gauge-fill {
+  stroke: var(--gold);
+  transition: stroke-dasharray 100ms linear;
+}
+.bt-speedo.boost .bt-gauge-fill {
+  stroke: #ff8a3d;
+}
+.bt-needle {
+  stroke: #d9472b;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transform-box: view-box;
+  transform-origin: 60px 60px;
+  transition: transform 100ms linear;
+}
+.bt-hub {
+  fill: var(--text);
+}
+.bt-speed-num {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  text-align: center;
+  line-height: 1;
+}
+.bt-speed-num strong {
+  display: block;
+  font: 400 34px/1 var(--display);
+  font-variant-numeric: tabular-nums;
+}
+.bt-speed-num span {
+  font: 11px var(--mono);
+  color: var(--muted);
+}
+.bt-boost-tag {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: #ff8a3d;
+  color: var(--ink);
+  font: 700 11px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.bt-help {
+  grid-column: 2 / 4;
+  grid-row: 3;
+  justify-self: end;
+  align-self: end;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 14px;
+  text-align: right;
+}
+.bt-help strong {
+  color: var(--warn);
+}
+
+/* Score popups, countdown and speed lines */
+.bt-popups {
+  position: absolute;
+  top: 26%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+.bt-popup {
+  font: 400 40px/1 var(--display);
+  letter-spacing: 1.5px;
+  color: var(--text);
+  text-shadow:
+    0 3px 0 rgba(20, 17, 15, 0.6),
+    0 0 24px rgba(0, 0, 0, 0.35);
+  animation: bt-float 1.7s ease-out forwards;
+}
+.bt-popup span {
+  color: var(--gold);
+}
+.bt-popup.land {
+  color: var(--ok);
+}
+.bt-popup.crash {
+  color: var(--warn);
+  font-size: 56px;
+}
+.bt-popup.info {
+  font: 600 18px var(--mono);
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: var(--panel);
+  text-shadow: none;
+}
+.bt-count {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  font: 400 min(30vw, 200px) / 1 var(--display);
+  color: var(--gold);
+  text-shadow: 0 8px 0 rgba(20, 17, 15, 0.55);
+  animation: bt-count 750ms ease-out forwards;
+}
+.bt-speedlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 200ms linear;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(255, 244, 220, 0.22) 0deg 0.4deg,
+    transparent 0.4deg 9deg
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse at center,
+    transparent 38%,
+    #000 80%
+  );
+  mask-image: radial-gradient(ellipse at center, transparent 38%, #000 80%);
+  animation: bt-lines 0.25s steps(2) infinite;
+}
+
+/* Cards */
+.bt-overlay {
+  z-index: 5;
+}
+.bt-overlay.center {
+  place-items: center;
+  background: rgba(20, 17, 15, 0.45);
+}
+.bt-card {
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  animation: bt-rise 320ms ease-out;
+}
+.bt-title {
+  font: 400 44px/1 var(--display);
+  letter-spacing: 1px;
+  margin: 6px 0 8px;
+}
+.bt-lede {
+  margin: 0 0 12px;
+  color: var(--text);
+}
+.bt-keys {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 6px 16px;
+  color: var(--muted);
+}
+.bt-keys li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bt-keys li > span {
+  min-width: 74px;
+}
+.bt-tip {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+.bt-stars {
+  display: flex;
+  gap: 6px;
+  font-size: 40px;
+  line-height: 1;
+  margin: 4px 0 10px;
+}
+.bt-stars span {
+  color: rgba(255, 255, 255, 0.15);
+}
+.bt-stars span.on {
+  color: var(--gold);
+  animation: bt-pop 400ms ease-out both;
+}
+.bt-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 4px;
+}
+.bt-stats div {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.bt-stats dt {
+  font: 11px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+.bt-stats dd {
+  margin: 2px 0 0;
+  font: 400 26px/1 var(--display);
+  letter-spacing: 0.5px;
+}
+.bt-new {
+  margin-left: 6px;
+  font: 700 11px var(--mono);
+  font-style: normal;
+  color: var(--ink);
+  background: var(--ok);
+  padding: 1px 6px;
+  border-radius: 5px;
+  vertical-align: middle;
+}
+.bt-results .reception-line {
+  font-size: 16px;
+  color: var(--muted);
+  margin: 10px 0 14px;
+}
+
+/* Touch controls only on touch screens */
+.bt-touch {
+  display: none;
+}
+@media (pointer: coarse) {
+  .bt-touch {
+    display: block;
+  }
+  .bt-help {
+    display: none;
+  }
+}
+.bt-touch-btn {
+  position: absolute;
+  pointer-events: auto;
+  touch-action: none;
+  min-width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  font: 700 16px var(--font);
+}
+.bt-touch-btn:active {
+  background: var(--gold);
+  color: var(--ink);
+}
+.bt-touch-btn.left {
+  left: 164px;
+  bottom: 16px;
+}
+.bt-touch-btn.right {
+  left: 236px;
+  bottom: 16px;
+}
+.bt-touch-btn.brake {
+  right: 104px;
+  bottom: 16px;
+  padding: 0 14px;
+}
+.bt-touch-btn.gas {
+  right: 16px;
+  bottom: 16px;
+  padding: 0 14px;
+  height: 96px;
+}
+.bt-touch-btn.pause {
+  right: 16px;
+  top: 96px;
+  min-width: 44px;
+  height: 44px;
+}
+
+/* Narrow screens: progress bar on its own row, smaller numbers */
+@media (max-width: 720px) {
+  .bt-hud {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 8px;
+    padding: 10px;
+  }
+  .bt-progress {
+    grid-column: 1 / 3;
+    grid-row: 2;
+    width: 100%;
+  }
+  .bt-meta {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .bt-speedo {
+    grid-row: 4;
+    width: 104px;
+    height: 104px;
+  }
+  .bt-speed-num strong {
+    font-size: 26px;
+  }
+  .bt-help {
+    grid-column: 2;
+    grid-row: 4;
+    font-size: 12px;
+  }
+  .bt-score-num {
+    font-size: 34px;
+  }
+  .bt-score {
+    min-width: 0;
+  }
+  .bt-score .eyebrow {
+    display: none;
+  }
+  .bt-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bt-title {
+    font-size: 34px;
+  }
+  .bt-popup {
+    font-size: 30px;
+  }
+  .bt-touch-btn.left {
+    left: 124px;
+  }
+  .bt-touch-btn.right {
+    left: 196px;
+  }
+}
+
+@keyframes bt-pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes bt-float {
+  0% {
+    transform: translateY(16px) scale(0.7);
+    opacity: 0;
+  }
+  15% {
+    transform: translateY(0) scale(1.08);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-14px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+}
+@keyframes bt-count {
+  0% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+}
+@keyframes bt-rise {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+@keyframes bt-lines {
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bt-popup,
+  .bt-count,
+  .bt-card,
+  .bt-combo,
+  .bt-stars span.on,
+  .bt-speedlines {
+    animation: none;
+  }
+  .bt-popup {
+    opacity: 1;
+  }
+  .bt-speedlines {
+    display: none;
+  }
+}

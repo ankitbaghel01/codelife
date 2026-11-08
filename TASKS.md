@@ -58,5 +58,10 @@ Tracks the phases in the PRD (`LIFE_exe_Game_PRD_and_Claude_Code_Prompt.md`, sec
 - [x] Interviewers swapped to the most South Asian-looking Rocketbox avatars (Male_Adult_04, Female_Adult_11)
 - [ ] Indian city view outside the windows, newer laptop model, asset compression
 - [x] Promotions: every 20 days worked, Problem solving 35/50/65/80+ → next level, +15% salary (performance review message otherwise)
+- [x] Work is its own place: "Go to work" opens your desk at your company (interviews stay at reception + interview room); you leave only when you choose (home, city map or trip)
+- [x] Work tasks: 3 DSA problems a day from the bank, paid on solving (₹300/600/1,000); unfinished tasks move to the next workday at 50% pay
+- [x] Weekends off (Day 1 = Monday); a missed weekday is marked absent (unpaid), HR warns at 3 absences per pay period
+- [x] Real days away pass in the game (capped at 30): rent, payday and absences apply on Continue
+- [x] Every 15 work tasks earn a company bike trip to Mistgiri Hills (playable ride, full energy afterwards)
 - [ ] Library and café, more companies and roles
 - [ ] Narrow-screen layouts, end-to-end test automation

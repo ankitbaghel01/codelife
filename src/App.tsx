@@ -10,6 +10,12 @@ import {
   findCompany,
   fmtTime,
   goToWork,
+  finishShift,
+  takeTrip,
+  catchUp,
+  nextWorkday,
+  weekday,
+  workTaskSolved,
   whyCantWork,
   interviewOutcome,
   newGame,
@@ -18,6 +24,8 @@ import {
   tick,
 } from "./game/state.ts";
 import { CityMap } from "./world/CityMap";
+import { WorkDesk, type Leave } from "./world/WorkDesk";
+import { BikeTrip } from "./world/BikeTrip";
 import { OfficeScene, Reception } from "./world/OfficeScene";
 import { InterviewScreen } from "./ui/interview/InterviewScreen";
 import { Menu } from "./ui/Menu";
@@ -28,7 +36,14 @@ import { addSolved, loadProblems } from "./ui/laptop/problems.ts";
 
 type Screen = "menu" | "intro" | "play";
 // Where the player is. The apartment is walkable; the city is a map; companies are focused scenes.
-type Place = { kind: "home" } | { kind: "city" } | { kind: "reception"; invitationId: string } | { kind: "interview"; invitationId: string };
+type Place =
+  | { kind: "home" }
+  | { kind: "city" }
+  | { kind: "reception"; invitationId: string }
+  | { kind: "interview"; invitationId: string }
+  | { kind: "work"; clockIn: number } // your own desk; interviews happen at other companies
+  | { kind: "trip" }
+  | { kind: "vacationDone" }; // the trip is over for good: back to work
 
 const LINES: Record<string, string> = {
   mirror: "You look tired, but ready. Today could be the day.",
@@ -66,6 +81,8 @@ export default function App() {
   }, []);
 
   const begin = () => {
+    // Real days since the last session pass in the game too (absences, rent, payday).
+    update((g) => catchUp(g, new Date().toLocaleDateString("en-CA")));
     enterFullscreen();
     setScreen("intro");
     window.setTimeout(() => setScreen("play"), 3200);
@@ -124,9 +141,8 @@ export default function App() {
     if (game.job?.companyId === companyId) {
       const r = goToWork(tick(game, travel));
       if (r.error) return say(r.error);
-      setGame(tick(r.state, travel));
-      setPlace({ kind: "home" });
-      say(`A full day at ${findCompany(companyId)?.name}. You are back home at ${fmtTime(tick(r.state, travel).minute)}, tired but a little better at your job.`);
+      setGame(r.state);
+      setPlace({ kind: "work", clockIn: r.state.minute });
       return;
     }
     const inv = game.invitations.find((v) => v.companyId === companyId && v.day === game.day && v.status !== "expired" && v.status !== "declined");
@@ -136,9 +152,31 @@ export default function App() {
     setPlace({ kind: "reception", invitationId: inv.id });
   };
 
+  // Leaving your desk finishes the shift; you choose where to go next.
+  const leaveWork = (to: Leave, clockIn: number, unfinished: string[]) => {
+    if (!game) return;
+    const g = finishShift(game, clockIn, unfinished);
+    if (to === "trip") {
+      setGame(g);
+      setPlace({ kind: "trip" });
+    } else if (to === "city") {
+      setGame(g);
+      setPlace({ kind: "city" });
+    } else {
+      setGame(tick(g, travel));
+      setPlace({ kind: "home" });
+      const home = fmtTime(tick(g, travel).minute);
+      say(
+        unfinished.length
+          ? `You're home at ${home}. ${unfinished.length} unfinished task${unfinished.length === 1 ? "" : "s"} moved to your next workday at half pay.`
+          : `You're back home at ${home}, tired but a little better at your job.`,
+      );
+    }
+  };
+
   // Dev-only hook so automated browser tests can act without pointer lock.
   useEffect(() => {
-    if (import.meta.env.DEV) Object.assign(window, { __app: { interact, update, setPlace, game } });
+    if (import.meta.env.DEV) Object.assign(window, { __app: { interact, update, setPlace, game, place } });
   });
 
   const laptopEl = laptop && (
@@ -159,6 +197,7 @@ export default function App() {
   const invitation =
     place.kind === "reception" || place.kind === "interview" ? game?.invitations.find((v) => v.id === place.invitationId) : undefined;
   const visiting = invitation ? findCompany(invitation.companyId) : undefined;
+  const workplace = place.kind === "work" && game?.job ? findCompany(game.job.companyId) : undefined;
 
   if (screen === "menu" || !game) {
     return (
@@ -178,12 +217,12 @@ export default function App() {
   return (
     <div className="stage">
       <Canvas shadows camera={{ fov: 70, near: 0.05, far: 60 }} dpr={[1, 1.75]}>
-        {visiting ? (
-          <OfficeScene company={visiting} />
+        {visiting || workplace ? (
+          <OfficeScene company={(visiting ?? workplace)!} alone={!visiting} />
         ) : (
           <Scene onReady={onSceneReady} />
         )}
-        {!visiting && (
+        {!visiting && !workplace && (
           <Player
           enabled={screen === "play" && !phone && !laptop && atHome}
           thirdPerson={third}
@@ -270,6 +309,53 @@ export default function App() {
               onClose={() => setPlace({ kind: "home" })}
             />
           )}
+          {place.kind === "work" && workplace && (
+            <WorkDesk
+              game={game}
+              company={workplace}
+              clockIn={place.clockIn}
+              onSolved={(p) => update((g) => workTaskSolved(g, p))}
+              onLeave={(to, unfinished) => leaveWork(to, place.clockIn, unfinished)}
+            />
+          )}
+          {place.kind === "trip" && (
+            <BikeTrip
+              company={findCompany(game.job?.companyId ?? "")?.name ?? "Your company"}
+              onDone={() => {
+                const r = takeTrip(game);
+                if (r.error) {
+                  setPlace({ kind: "home" });
+                  return say(r.error);
+                }
+                setGame(tick(r.state, travel));
+                setPlace({ kind: "vacationDone" });
+              }}
+            />
+          )}
+          {place.kind === "vacationDone" && (() => {
+            const next = nextWorkday(game.day, game.minute);
+            return (
+              <div className="reception vacation" role="dialog" aria-labelledby="vacation-title">
+                <div className="reception-card">
+                  <p className="eyebrow">
+                    Day {game.day} · {weekday(game.day)} · {fmtTime(game.minute)}
+                  </p>
+                  <h2 id="vacation-title">Vacation complete 🏍️</h2>
+                  <p className="reception-line">
+                    I hope you enjoyed the ride to Mistgiri Hills! You're home, fully rested. Now it's back to work.
+                  </p>
+                  <p className="vacation-next">
+                    Your next workday: <b>Day {next}, {weekday(next)}</b> · shift 09:00–17:00
+                  </p>
+                  <div className="reception-actions">
+                    <button className="btn primary" autoFocus onClick={() => setPlace({ kind: "home" })}>
+                      Back to work
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
           {place.kind === "reception" && invitation && visiting && (
             <Reception
               company={visiting}

@@ -43,6 +43,10 @@ export type Job = {
   lastWorkedDay: number;
   level: number; // 1 at joining; promotions raise it
   totalDaysWorked: number;
+  tasksDone: { id: string; day: number }[]; // work tasks solved at this company
+  tripsTaken: number;
+  carryOver: string[]; // tasks left unfinished: due on the next workday, at late pay
+  absentDays: number[]; // workdays missed since the last payday
 };
 export type Evidence = {
   day: number;
@@ -67,6 +71,7 @@ export type GameState = {
   job: Job | null;
   solved: string[]; // practice problem ids solved at least once
   evidence: Evidence[];
+  lastPlayed?: string; // real calendar date (YYYY-MM-DD) of the last session
 };
 
 export type Result = { state: GameState; error?: string };
@@ -172,6 +177,51 @@ export function sleep(s: GameState): GameState {
   });
 }
 
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+/** Day 1 is a Monday; the office is closed on Saturdays and Sundays. */
+export const weekday = (day: number) => WEEKDAYS[day % 7];
+export const isWorkday = (day: number) => day % 7 !== 6 && day % 7 !== 0;
+/** The next day you can start a shift: today if it's a workday and not past 17:00, else the next weekday. */
+export function nextWorkday(day: number, minute: number): number {
+  let d = isWorkday(day) && minute <= CONFIG.work.endMinute - 60 ? day : day + 1;
+  while (!isWorkday(d)) d++;
+  return d;
+}
+
+/** A workday that ended without a shift counts as absent (unpaid, since pay is pro-rated by days worked). */
+function markAbsence(s: GameState, day: number): GameState {
+  const j = s.job;
+  if (!j || day < j.startDay || !isWorkday(day) || j.lastWorkedDay === day || j.absentDays.includes(day)) return s;
+  const absentDays = [...j.absentDays, day];
+  const company = findCompany(j.companyId)?.name ?? "HR";
+  let g: GameState = { ...s, job: { ...j, absentDays } };
+  g = addMessage(g, `absent-${day}`, `${company} · HR`, `You were marked absent on Day ${day} (${weekday(day)}). That day is unpaid.`);
+  if (absentDays.length === CONFIG.work.absenceWarnAt)
+    g = addMessage(
+      g,
+      `absent-warn-${day}`,
+      `${company} · HR`,
+      `Warning: ${absentDays.length} absences this month. Please come to work on every weekday (09:00–17:00).`,
+    );
+  return g;
+}
+
+/** Real days away from the game pass in the game too (capped): rent, payday and absences all apply. */
+export function catchUp(s: GameState, today: string): GameState {
+  const days = s.lastPlayed
+    ? Math.min(CONFIG.away.maxDays, Math.round((Date.parse(today) - Date.parse(s.lastPlayed)) / 86400000))
+    : 0;
+  let g: GameState = { ...s, lastPlayed: today };
+  if (!(days > 0)) return g;
+  for (let i = 0; i < days; i++) g = sleep(g);
+  return addMessage(
+    g,
+    `away-${today}`,
+    "CodeLife",
+    `You were away for ${days} day${days === 1 ? "" : "s"}. Life went on: it's now Day ${g.day}.`,
+  );
+}
+
 /** Rent, payday and new job invitations, once per game day. */
 export function onNewDay(s: GameState): GameState {
   let g = s;
@@ -184,6 +234,7 @@ export function onNewDay(s: GameState): GameState {
       `Rent of ₹${CONFIG.costs.rent.toLocaleString("en-IN")} received. Thank you.`,
     );
   }
+  g = markAbsence(g, g.day - 1);
   const j = g.job;
   if (j && g.day > j.startDay && (g.day - j.startDay) % 30 === 0) {
     // Salary is pro-rated by days actually worked, so skipping work has a cost.
@@ -191,7 +242,7 @@ export function onNewDay(s: GameState): GameState {
       (j.monthlySalary * Math.min(j.daysWorked, CONFIG.work.fullMonthDays)) /
         CONFIG.work.fullMonthDays,
     );
-    g = { ...g, job: { ...j, daysWorked: 0 } };
+    g = { ...g, job: { ...j, daysWorked: 0, absentDays: [] } };
     if (pay > 0)
       g = addTxn(
         g,
@@ -202,7 +253,9 @@ export function onNewDay(s: GameState): GameState {
       g,
       `pay-${g.day}`,
       findCompany(j.companyId)?.name ?? "Payroll",
-      `Payday: ₹${pay.toLocaleString("en-IN")} credited for ${j.daysWorked} day(s) worked.`,
+      `Payday: ₹${pay.toLocaleString("en-IN")} credited for ${j.daysWorked} day(s) worked${
+        j.absentDays.length ? ` (${j.absentDays.length} absent, unpaid)` : ""
+      }.`,
     );
   }
   return refreshInvitations(g);
@@ -478,6 +531,10 @@ export function interviewOutcome(
         lastWorkedDay: 0,
         level: 1,
         totalDaysWorked: 0,
+        tasksDone: [],
+        tripsTaken: 0,
+        carryOver: [],
+        absentDays: [],
       },
     };
     g = addMessage(
@@ -502,6 +559,7 @@ export function whyCantWork(s: GameState): string | null {
   const j = s.job;
   if (!j) return "You don't have a job yet.";
   if (s.day < j.startDay) return `You start on Day ${j.startDay}.`;
+  if (!isWorkday(s.day)) return `It's ${weekday(s.day)}. The office is closed at the weekend.`;
   if (j.lastWorkedDay === s.day) return "You've already worked today. Come back tomorrow.";
   if (s.minute > CONFIG.work.endMinute - 60)
     return "Your office is closed for today. A shift has to start by 17:00 (the bus takes 30 min).";
@@ -509,21 +567,91 @@ export function whyCantWork(s: GameState): string | null {
   return null;
 }
 
-/** A work shift at your company: costs time and energy, counts towards this month's pay, builds experience.
- * Arriving before 09:00 is fine: you wait at the office until the shift starts. */
+/** Clock in at your office: the day counts as worked. Arriving before 09:00, you wait for the shift to start.
+ * Time, energy and experience for the shift are applied by [finishShift] when you leave. */
 export function goToWork(s0: GameState): Result {
   const why = whyCantWork(s0);
   if (why) return { state: s0, error: why };
   const s = s0.minute < CONFIG.work.startMinute ? tick(s0, CONFIG.work.startMinute - s0.minute) : s0;
   const j = s.job!;
-  let g = tick(
-    { ...s, job: { ...j, daysWorked: j.daysWorked + 1, totalDaysWorked: j.totalDaysWorked + 1, lastWorkedDay: s.day } },
-    CONFIG.work.shiftMinutes,
-  );
+  return {
+    state: { ...s, job: { ...j, daysWorked: j.daysWorked + 1, totalDaysWorked: j.totalDaysWorked + 1, lastWorkedDay: s.day } },
+  };
+}
+
+/** Leave the office: the shift runs its full length from [clockIn], then costs energy and builds experience. */
+export function finishShift(s: GameState, clockIn: number, unfinished: string[] = []): GameState {
+  const left = clockIn + CONFIG.work.shiftMinutes - s.minute;
+  let g: GameState = s.job ? { ...s, job: { ...s.job, carryOver: unfinished } } : s;
+  g = left > 0 ? tick(g, left) : g;
   g = { ...g, energy: clamp(g.energy - CONFIG.work.energyCost) };
   g = raise(g, "Problem solving", 0.5, "A day of real work");
   g = raise(g, "Communication", 0.5, "A day of real work");
-  return { state: promote(g) };
+  return promote(g);
+}
+
+// Same order all day, a new order every day (FNV-1a hash of day + id).
+const dayRank = (day: number, id: string) => {
+  let h = 2166136261 ^ day;
+  for (const c of id) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+  return h >>> 0;
+};
+
+/** Today's work tasks (problem ids): late ones carried over, the ones already solved today, then new problems up to tasksPerDay. */
+export function workTasks(s: GameState, problemIds: string[]): string[] {
+  const j = s.job;
+  if (!j) return [];
+  const today = j.tasksDone.filter((t) => t.day === s.day).map((t) => t.id);
+  const done = new Set(j.tasksDone.map((t) => t.id));
+  const late = j.carryOver.filter((id) => !done.has(id) && problemIds.includes(id));
+  const fresh = problemIds
+    .filter((id) => !done.has(id) && !late.includes(id))
+    .sort((a, b) => dayRank(s.day, a) - dayRank(s.day, b))
+    .slice(0, Math.max(0, CONFIG.work.tasksPerDay - today.length - late.length));
+  return [...late, ...today, ...fresh];
+}
+
+/** What a task pays: full on the day it's assigned, latePayRate once it has been carried over. */
+export const taskPay = (difficulty: string, late = false) =>
+  Math.round((CONFIG.work.taskPay[difficulty] ?? CONFIG.work.taskPay.easy) * (late ? CONFIG.work.latePayRate : 1));
+
+/** Trips earned (one per tripEveryTasks tasks) and not taken yet. */
+export const tripsWaiting = (s: GameState) =>
+  s.job ? Math.floor(s.job.tasksDone.length / CONFIG.work.tripEveryTasks) - s.job.tripsTaken : 0;
+
+/** A work task solved: paid on the spot, and every tripEveryTasks tasks the company sends you on a bike trip. */
+export function workTaskSolved(
+  s: GameState,
+  p: { id: string; title: string; difficulty: string },
+): GameState {
+  const j = s.job;
+  if (!j || j.tasksDone.some((t) => t.id === p.id)) return s;
+  const late = j.carryOver.includes(p.id);
+  const pay = taskPay(p.difficulty, late);
+  let g: GameState = {
+    ...s,
+    job: { ...j, tasksDone: [...j.tasksDone, { id: p.id, day: s.day }], carryOver: j.carryOver.filter((id) => id !== p.id) },
+  };
+  g = addTxn(g, `${late ? "Late work task" : "Work task"}: ${p.title}`, pay);
+  g = raise(g, "DSA", (CONFIG.practiceGain[p.difficulty] ?? 2) / 2, `Work task “${p.title}”`);
+  const n = g.job!.tasksDone.length;
+  if (n % CONFIG.work.tripEveryTasks === 0) {
+    g = addMessage(
+      g,
+      `trip-${j.companyId}-${n}`,
+      findCompany(j.companyId)?.name ?? "Your manager",
+      `You've solved ${n} work tasks. As a thank-you, the company is sending you on a bike trip to Mistgiri Hills! Start it from your desk at work.`,
+    );
+  }
+  return g;
+}
+
+/** The bike trip: a few hours out of the city that leave you rested and closer to your team. */
+export function takeTrip(s: GameState): Result {
+  if (tripsWaiting(s) <= 0) return { state: s, error: "You don't have a trip waiting." };
+  let g = tick({ ...s, job: { ...s.job!, tripsTaken: s.job!.tripsTaken + 1 } }, 4 * 60);
+  g = { ...g, energy: 100 };
+  return { state: raise(g, "Communication", 2, "Company bike trip with the team") };
 }
 
 /** Every N days worked, a good enough problem solver is promoted: higher level, title and salary. */
@@ -593,7 +721,7 @@ export function parseSave(raw: string | null): GameState | null {
           ? v.resume
           : { summary: "", projects: [] },
       invitations: v.invitations ?? [],
-      job: v.job ? { level: 1, totalDaysWorked: 0, ...v.job } : null,
+      job: v.job ? { level: 1, totalDaysWorked: 0, tasksDone: [], tripsTaken: 0, carryOver: [], absentDays: [], ...v.job } : null,
       solved: v.solved ?? [],
       evidence: Array.isArray(v.evidence) ? v.evidence : [],
     } as GameState;

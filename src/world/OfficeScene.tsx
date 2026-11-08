@@ -444,6 +444,7 @@ function Ready({ onReady }: { onReady?: () => void }) {
 type Props = {
   company: Company;
   interviewer?: Interviewer; // defaults to company.interviewer
+  alone?: boolean; // your own desk at work: nobody across the table
   onReady?: () => void;
 };
 
@@ -451,6 +452,7 @@ type Props = {
 export function OfficeScene({
   company,
   interviewer = company.interviewer,
+  alone = false,
   onReady,
 }: Props) {
   return (
@@ -461,7 +463,7 @@ export function OfficeScene({
         <Lights />
         <Room company={company} />
         <Furniture />
-        <SeatedPerson gender={interviewer.gender} at={[0, 0, DESK_Z - 0.8]} />
+        {!alone && <SeatedPerson gender={interviewer.gender} at={[0, 0, DESK_Z - 0.8]} />}
         <Ready onReady={onReady} />
       </Suspense>
       <EffectComposer multisampling={0}>

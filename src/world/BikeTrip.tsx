@@ -115,16 +115,17 @@ function Rig({
       const a = c.orbit + h + 2.2;
       tmp.want.set(x + Math.sin(a) * 7, y + 2.2, z + Math.cos(a) * 7);
     } else {
-      const back = 6 + s.speed * 0.05;
-      tmp.want.set(x - fx * back, y + 2.1 + (s.air ? 0.6 : 0), z - fz * back);
+      const back = 4.6 + s.speed * 0.03;
+      tmp.want.set(x - fx * back, y + 1.9 + (s.air ? 0.6 : 0), z - fz * back);
     }
-    tmp.look.set(x + fx * 4, y + 0.7, z + fz * 4);
+    const orbiting = ph === "intro" || ph === "finished";
+    tmp.look.set(x + (orbiting ? 0 : fx * 4), y + (orbiting ? -1.4 : 0.7), z + (orbiting ? 0 : fz * 4));
     if (!c.ready) {
       c.pos.copy(tmp.want);
       c.look.copy(tmp.look);
       c.ready = true;
     }
-    c.pos.lerp(tmp.want, 1 - Math.exp(-dt * 5));
+    c.pos.lerp(tmp.want, 1 - Math.exp(-dt * 12));
     c.look.lerp(tmp.look, 1 - Math.exp(-dt * 10));
     camera.position.copy(c.pos);
     if (!reduced && s.shake > 0) {

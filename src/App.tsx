@@ -216,7 +216,13 @@ export default function App() {
 
   return (
     <div className="stage">
-      <Canvas shadows camera={{ fov: 70, near: 0.05, far: 60 }} dpr={[1, 1.75]}>
+      <Canvas
+        shadows
+        camera={{ fov: 70, near: 0.05, far: 60 }}
+        dpr={[1, 1.75]}
+        // The bike trip has its own canvas on top; pausing this one keeps the ride smooth.
+        frameloop={place.kind === "trip" ? "never" : "always"}
+      >
         {visiting || workplace ? (
           <OfficeScene company={(visiting ?? workplace)!} alone={!visiting} />
         ) : (
@@ -333,7 +339,8 @@ export default function App() {
             />
           )}
           {place.kind === "vacationDone" && (() => {
-            const next = nextWorkday(game.day, game.minute);
+            const workedToday = game.job?.lastWorkedDay === game.day;
+            const next = workedToday ? nextWorkday(game.day + 1, 0) : nextWorkday(game.day, game.minute);
             return (
               <div className="reception vacation" role="dialog" aria-labelledby="vacation-title">
                 <div className="reception-card">

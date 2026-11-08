@@ -422,13 +422,17 @@
   padding: 8px 12px;
   border-radius: 10px;
   background: rgba(240, 113, 103, 0.12);
-  border-left: 3px solid var(--warn);
+  border: 1px solid rgba(240, 113, 103, 0.35);
 }
 
 /* After the company trip (App.tsx) */
 .vacation {
   place-items: center;
-  background: radial-gradient(ellipse at 50% 30%, rgba(242, 181, 68, 0.25), rgba(20, 17, 15, 0.85));
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    rgba(242, 181, 68, 0.25),
+    rgba(20, 17, 15, 0.85)
+  );
 }
 .vacation h2 {
   font-family: var(--display);

@@ -140,6 +140,7 @@
 
 .bt-meta {
   grid-column: 3;
+  justify-self: end;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -482,7 +483,7 @@
 /* Narrow screens: progress bar on its own row, smaller numbers */
 @media (max-width: 720px) {
   .bt-hud {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-rows: auto auto 1fr auto;
     gap: 8px;
     padding: 10px;

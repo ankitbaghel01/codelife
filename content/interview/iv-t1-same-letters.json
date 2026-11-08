@@ -1,0 +1,141 @@
+{
+  "id": "iv-t1-same-letters",
+  "version": 1,
+  "title": "Jumbled Name Tags",
+  "tier": "T1",
+  "difficulty": "easy",
+  "folder": "basics",
+  "topic": "strings",
+  "tags": [
+    "strings",
+    "counting"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "At a college fest the name-tag printer scrambled the letters. Given two strings `a` and `b`, return `True` if they use **exactly the same letters the same number of times**, ignoring upper/lower case and ignoring spaces. Otherwise return `False`.",
+  "function": {
+    "name": "same_letters",
+    "params": [
+      {
+        "name": "a",
+        "type": "str"
+      },
+      {
+        "name": "b",
+        "type": "str"
+      }
+    ],
+    "returns": "bool"
+  },
+  "constraints": [
+    "0 <= len(a), len(b) <= 10^5",
+    "strings contain only letters a-z, A-Z and spaces"
+  ],
+  "examples": [
+    {
+      "args": [
+        "Listen",
+        "Silent"
+      ],
+      "expected": true,
+      "explanation": "Both use e, i, l, n, s, t once."
+    },
+    {
+      "args": [
+        "Dormitory",
+        "Dirty room"
+      ],
+      "expected": true,
+      "explanation": "Spaces and case are ignored."
+    }
+  ],
+  "starter": {
+    "python": "def same_letters(a, b):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        "abc",
+        "abd"
+      ],
+      "expected": false
+    },
+    {
+      "args": [
+        "",
+        "  "
+      ],
+      "expected": true
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        "aab",
+        "abb"
+      ],
+      "expected": false
+    },
+    {
+      "args": [
+        "Astronomer",
+        "Moon starer"
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        "a",
+        "A"
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        "abc",
+        "ab"
+      ],
+      "expected": false
+    },
+    {
+      "args": [
+        "The eyes",
+        "They see"
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        "zz z",
+        "zzzz"
+      ],
+      "expected": false
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Order doesn't matter, only how many of each letter.",
+    "Count letters with a dictionary (or a list of 26).",
+    "Add 1 per letter of a, subtract 1 per letter of b (skipping spaces); every count must end at 0."
+  ],
+  "followUps": [
+    "What changes if the strings can contain any Unicode characters?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(1)"
+  }
+}

@@ -4,6 +4,15 @@ import { resolve, boomLength } from "../src/game/collision.ts";
 import {
   addSkill,
   balance,
+  canAttend,
+  findRole,
+  goToWork,
+  interviewOutcome,
+  practiceSolved,
+  qualifies,
+  refreshInvitations,
+  respondInvitation,
+  setResume,
   eat,
   newGame,
   parseSave,
@@ -45,7 +54,7 @@ test("new game uses PRD starting state", () => {
   assert.equal(g.name, "Aarav");
   assert.equal(balance(g), 5000);
   assert.equal(g.skills.find((s) => s.name === "HTML").proficiency, 40);
-  assert.equal(g.messages.length, 3);
+  assert.equal(g.messages.length, 4); // 3 story messages + the first job invitation
 });
 test("names are validated", () => {
   assert.ok(validName(""));
@@ -105,5 +114,100 @@ test("saves round-trip and bad saves are rejected", () => {
     null,
   );
 });
+
+
+// ---------- Phase 2: invitations, practice, resume ----------
+test("day 1: the fresher is invited to the T1 company for day 2", () => {
+  const g = newGame("A");
+  assert.equal(g.invitations.length, 1);
+  const v = g.invitations[0];
+  assert.deepEqual([v.companyId, v.day, v.status], ["sutradhar", 2, "pending"]);
+});
+test("only one new invitation per day, and no duplicate for the same company", () => {
+  assert.equal(refreshInvitations(newGame("A")).invitations.length, 1);
+});
+test("accepting an invitation and the attendance window", () => {
+  let g = newGame("A");
+  const id = g.invitations[0].id;
+  const inv = (s) => s.invitations.find((v) => v.id === id);
+  assert.ok(canAttend(g, inv(g))); // still pending
+  g = respondInvitation(g, id, true).state;
+  assert.match(canAttend(g, inv(g)), /Day 2/);
+  g = sleep(g); // day 2, 07:00
+  assert.match(canAttend(g, inv(g)), /09:00/);
+  g = tick(g, 3 * 60); // 10:00
+  assert.equal(canAttend(g, inv(g)), undefined);
+  assert.ok(respondInvitation(g, id, false).error); // can't change after accepting
+});
+test("a missed interview expires the next day", () => {
+  let g = newGame("A");
+  g = respondInvitation(g, g.invitations[0].id, true).state;
+  g = sleep(sleep(g)); // day 3
+  assert.equal(g.invitations[0].status, "expired");
+});
+test("practice: first accepted solution raises DSA, repeats don't", () => {
+  const p = { id: "t1-x", title: "X", difficulty: "medium" };
+  const a = practiceSolved(newGame("A"), p);
+  const dsa = (g) => g.skills.find((k) => k.name === "DSA").proficiency;
+  assert.equal(dsa(a), 14);
+  assert.equal(a.evidence.length, 2); // DSA + Problem solving (no Python skill listed)
+  assert.equal(practiceSolved(a, p), a);
+});
+test("practice raises a listed Python skill (evidence for a claimed skill)", () => {
+  const g = practiceSolved(addSkill(newGame("A"), "Python").state, { id: "t1-y", title: "Y", difficulty: "easy" });
+  assert.equal(g.skills.find((k) => k.name === "Python").proficiency, 1);
+});
+test("enough practice unlocks the T2 company", () => {
+  let g = newGame("A");
+  const role = findRole("kiranacart", "frontend");
+  assert.equal(qualifies(g, role), false);
+  g = { ...g, skills: g.skills.map((k) => (k.name === "JavaScript" ? { ...k, proficiency: 40 } : k.name === "DSA" ? { ...k, proficiency: 25 } : k)) };
+  assert.equal(qualifies(g, role), true);
+});
+test("resume validation", () => {
+  const g = newGame("A");
+  assert.ok(setResume(g, { summary: "x".repeat(401), projects: [] }).error);
+  assert.ok(setResume(g, { summary: "", projects: [{ name: "", description: "" }] }).error);
+  const ok = setResume(g, { summary: " Fresher ", projects: [{ name: " Todo app ", description: "React + localStorage" }] });
+  assert.equal(ok.error, undefined);
+  assert.deepEqual(ok.state.resume, { summary: "Fresher", projects: [{ name: "Todo app", description: "React + localStorage" }] });
+});
+
+// ---------- Phase 5: offer, work, salary, rent ----------
+const offer = { companyId: "sutradhar", roleId: "jr-web", title: "Junior Web Developer", monthlySalary: 26000, joinInDays: 2 };
+test("rejection keeps you unemployed; accepting an offer creates the job", () => {
+  const g = newGame("A");
+  const id = g.invitations[0].id;
+  const r = interviewOutcome(g, id, null, false);
+  assert.equal(r.job, null);
+  assert.equal(r.invitations[0].status, "attended");
+  assert.equal(interviewOutcome(g, id, offer, false).job, null); // declined offer
+  assert.equal(interviewOutcome(g, id, offer, true).job.startDay, 3);
+});
+test("work shifts: start day, hours, once a day, energy", () => {
+  let g = interviewOutcome(newGame("A"), "x", offer, true); // starts day 3
+  assert.match(goToWork(g).error, /Day 3/);
+  g = tick(sleep(sleep(g)), 2 * 60); // day 3, 09:00
+  const w = goToWork(g);
+  assert.equal(w.error, undefined);
+  assert.equal(w.state.job.daysWorked, 1);
+  assert.equal(w.state.minute, 17 * 60);
+  assert.match(goToWork(w.state).error, /already/);
+});
+test("payday is pro-rated by days worked; rent is charged on day 30", () => {
+  let g = interviewOutcome(newGame("A"), "x", offer, true); // job from day 3
+  g = { ...g, job: { ...g.job, daysWorked: 10 } };
+  const start = balance(g);
+  while (g.day < 33) g = sleep(g); // passes day 30 (rent) and day 33 (first payday)
+  assert.equal(balance(g) - start, 13000 - 4000);
+  assert.equal(g.job.daysWorked, 0);
+});
+test("old saves without the new fields still load", () => {
+  const old = { version: 1, name: "A", day: 1, minute: 0, energy: 1, hunger: 1, skills: [], ledger: [], messages: [] };
+  const g = parseSave(JSON.stringify(old));
+  assert.ok(g && typeof g.playerId === "string");
+  assert.deepEqual([g.invitations, g.solved, g.job], [[], [], null]);
+});
+
 
 console.log(`\n${n} checks passed`);

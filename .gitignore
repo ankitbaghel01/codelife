@@ -3,3 +3,7 @@ dist/
 .playwright-mcp/
 __pycache__/
 .ruff_cache/
+server/data/*.db
+.venv/
+public/assets/models/office_notepads/
+.pytest_cache/

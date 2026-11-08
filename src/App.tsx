@@ -4,18 +4,33 @@ import { Scene } from "./game/Scene";
 import { Player } from "./game/Player";
 import { useGame } from "./game/useGame";
 import { CONFIG } from "./game/config.ts";
-import { eat, newGame, sleep, tick } from "./game/state.ts";
+import {
+  canAttend,
+  eat,
+  findCompany,
+  fmtTime,
+  goToWork,
+  interviewOutcome,
+  newGame,
+  practiceSolved,
+  sleep,
+  tick,
+} from "./game/state.ts";
+import { CityMap } from "./world/CityMap";
+import { OfficeScene, Reception } from "./world/OfficeScene";
+import { InterviewScreen } from "./ui/interview/InterviewScreen";
 import { Menu } from "./ui/Menu";
 import { Hud } from "./ui/Hud";
 import { Phone } from "./ui/Phone";
 import { Laptop } from "./ui/laptop/Laptop";
-import { addSolved } from "./ui/laptop/problems.ts";
+import { addSolved, loadProblems } from "./ui/laptop/problems.ts";
 
 type Screen = "menu" | "intro" | "play";
+// Where the player is. The apartment is walkable; the city is a map; companies are focused scenes.
+type Place = { kind: "home" } | { kind: "city" } | { kind: "reception"; invitationId: string } | { kind: "interview"; invitationId: string };
 
 const LINES: Record<string, string> = {
   mirror: "You look tired, but ready. Today could be the day.",
-  door: "The city is outside. Streets and companies open in the next build (Phase 2).",
 };
 
 function enterFullscreen() {
@@ -35,6 +50,8 @@ export default function App() {
       import.meta.env.DEV && new URLSearchParams(location.search).has("laptop"),
   );
   const [third, setThird] = useState(false);
+  const [place, setPlace] = useState<Place>({ kind: "home" });
+  const atHome = place.kind === "home";
   const [near, setNear] = useState<string | null>(null);
   const [subtitle, setSubtitle] = useState<string | null>(null);
   const timer = useRef<number>();
@@ -55,14 +72,14 @@ export default function App() {
 
   // In-game clock: 1 real second = 1 game minute, only while you are actually playing.
   useEffect(() => {
-    if (screen !== "play" || !locked || phone) return;
+    if (screen !== "play" || !locked || phone || !atHome) return;
     const id = window.setInterval(() => update((g) => tick(g, 1)), 1000);
     return () => window.clearInterval(id);
-  }, [screen, locked, phone, update]);
+  }, [screen, locked, phone, atHome, update]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (screen !== "play" || laptop) return; // the laptop owns the keyboard while open
+      if (screen !== "play" || laptop || !atHome) return; // laptop, map and interviews own the keyboard
       const typing = e.target instanceof HTMLInputElement;
       if (phone && e.code === "Escape") setPhone(false);
       else if (!typing && e.code === "KeyP") setPhone((p) => !p);
@@ -70,7 +87,7 @@ export default function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [screen, phone, locked, laptop]);
+  }, [screen, phone, locked, laptop, atHome]);
 
   const interact = useCallback(
     (id: string) => {
@@ -85,6 +102,8 @@ export default function App() {
         });
       } else if (id === "laptop") {
         setLaptop(true);
+      } else if (id === "door") {
+        setPlace({ kind: "city" });
       } else {
         say(LINES[id] ?? "");
       }
@@ -92,13 +111,53 @@ export default function App() {
     [update, say],
   );
 
+  const travel = CONFIG.travelMinutes;
+  const goPlace = (id: string) => {
+    if (!game) return;
+    if (id === "home") {
+      update((g) => tick(g, travel));
+      setPlace({ kind: "home" });
+      return;
+    }
+    const companyId = id.replace(/^company:/, "");
+    if (game.job?.companyId === companyId) {
+      const r = goToWork(tick(game, travel));
+      if (r.error) return say(r.error);
+      setGame(tick(r.state, travel));
+      setPlace({ kind: "home" });
+      say(`A full day at ${findCompany(companyId)?.name}. You are back home at ${fmtTime(tick(r.state, travel).minute)}, tired but a little better at your job.`);
+      return;
+    }
+    const inv = game.invitations.find((v) => v.companyId === companyId && v.day === game.day && v.status !== "expired" && v.status !== "declined");
+    const why = inv ? canAttend(game, inv) : "You don't have an interview here.";
+    if (!inv || why) return say(why ?? "");
+    update((g) => tick(g, travel));
+    setPlace({ kind: "reception", invitationId: inv.id });
+  };
+
+  // Dev-only hook so automated browser tests can act without pointer lock.
+  useEffect(() => {
+    if (import.meta.env.DEV) Object.assign(window, { __app: { interact, update, setPlace, game } });
+  });
+
   const laptopEl = laptop && (
     <Laptop
       game={game ?? { day: 1, minute: 8 * 60 }}
       onClose={() => setLaptop(false)}
-      onSolved={addSolved}
+      onSolved={(id) => {
+        addSolved(id);
+        // Practice raises proficiency through explicit rules (state.ts), only on the first accepted solution.
+        loadProblems().then((ps) => {
+          const p = ps.find((x) => x.id === id);
+          if (p) update((g) => practiceSolved(g, p));
+        });
+      }}
     />
   );
+
+  const invitation =
+    place.kind === "reception" || place.kind === "interview" ? game?.invitations.find((v) => v.id === place.invitationId) : undefined;
+  const visiting = invitation ? findCompany(invitation.companyId) : undefined;
 
   if (screen === "menu" || !game) {
     return (
@@ -118,14 +177,20 @@ export default function App() {
   return (
     <div className="stage">
       <Canvas shadows camera={{ fov: 70, near: 0.05, far: 60 }} dpr={[1, 1.75]}>
-        <Scene onReady={onSceneReady} />
-        <Player
-          enabled={screen === "play" && !phone && !laptop}
+        {visiting ? (
+          <OfficeScene company={visiting} />
+        ) : (
+          <Scene onReady={onSceneReady} />
+        )}
+        {!visiting && (
+          <Player
+          enabled={screen === "play" && !phone && !laptop && atHome}
           thirdPerson={third}
           onLockChange={setLocked}
           onNear={setNear}
           onInteract={interact}
         />
+        )}
       </Canvas>
 
       {!sceneReady && screen === "play" && (
@@ -146,13 +211,15 @@ export default function App() {
 
       {screen === "play" && (
         <>
+          {atHome && (
           <Hud
             game={game}
             near={locked ? near : null}
             subtitle={subtitle}
             thirdPerson={third}
           />
-          {!locked && !phone && !laptop && (
+          )}
+          {!locked && !phone && !laptop && atHome && (
             <div className="pause">
               <div className="menu-card">
                 <h2>Paused</h2>
@@ -191,6 +258,43 @@ export default function App() {
             />
           )}
           {laptopEl}
+          {place.kind === "city" && (
+            <CityMap
+              day={game.day}
+              minute={game.minute}
+              invitations={game.invitations}
+              job={game.job}
+              onGo={goPlace}
+              onClose={() => setPlace({ kind: "home" })}
+            />
+          )}
+          {place.kind === "reception" && invitation && visiting && (
+            <Reception
+              company={visiting}
+              time={invitation.time}
+              onCheckIn={() => setPlace({ kind: "interview", invitationId: invitation.id })}
+              onLeave={() => setPlace({ kind: "city" })}
+            />
+          )}
+          {place.kind === "interview" && invitation && (
+            <InterviewScreen
+              invitation={invitation}
+              playerId={game.playerId}
+              profile={{ name: game.name, skills: game.skills, resume: game.resume }}
+              onExit={() => setPlace({ kind: "city" })}
+              onDone={({ evaluation, accepted }) => {
+                update((g) => tick(interviewOutcome(g, invitation.id, evaluation.offer, accepted), travel));
+                setPlace({ kind: "home" });
+                say(
+                  evaluation.offer
+                    ? accepted
+                      ? `You accepted the offer from ${visiting?.name}. Check your phone for your start day.`
+                      : "You declined the offer. More companies will call as your skills grow."
+                    : "Not this time. Your report shows what to practise next.",
+                );
+              }}
+            />
+          )}
         </>
       )}
     </div>

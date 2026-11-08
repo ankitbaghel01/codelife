@@ -1,0 +1,239 @@
+{
+  "id": "iv-t1-running-balance",
+  "version": 1,
+  "title": "Wallet Ledger",
+  "tier": "T1",
+  "difficulty": "easy",
+  "folder": "basics",
+  "topic": "arrays",
+  "tags": [
+    "arrays",
+    "prefix-sum"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "Your UPI wallet starts with `start` rupees. `changes` lists every transaction in order: a positive number is money in, a negative number is money out.\n\nReturn a list with the wallet balance **after each transaction**.",
+  "function": {
+    "name": "running_balance",
+    "params": [
+      {
+        "name": "start",
+        "type": "int"
+      },
+      {
+        "name": "changes",
+        "type": "list[int]"
+      }
+    ],
+    "returns": "list[int]"
+  },
+  "constraints": [
+    "0 <= len(changes) <= 10^5",
+    "-10^6 <= start, changes[i] <= 10^6"
+  ],
+  "examples": [
+    {
+      "args": [
+        100,
+        [
+          50,
+          -30,
+          10
+        ]
+      ],
+      "expected": [
+        150,
+        120,
+        130
+      ],
+      "explanation": "100+50=150, 150-30=120, 120+10=130."
+    },
+    {
+      "args": [
+        0,
+        [
+          -5
+        ]
+      ],
+      "expected": [
+        -5
+      ],
+      "explanation": "The balance may go negative."
+    }
+  ],
+  "starter": {
+    "python": "def running_balance(start, changes):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        10,
+        []
+      ],
+      "expected": []
+    },
+    {
+      "args": [
+        5,
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "expected": [
+        6,
+        7,
+        8
+      ]
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        0,
+        [
+          0,
+          0
+        ]
+      ],
+      "expected": [
+        0,
+        0
+      ]
+    },
+    {
+      "args": [
+        -10,
+        [
+          10,
+          10
+        ]
+      ],
+      "expected": [
+        0,
+        10
+      ]
+    },
+    {
+      "args": [
+        1000000,
+        [
+          -1000000,
+          -1000000
+        ]
+      ],
+      "expected": [
+        0,
+        -1000000
+      ]
+    },
+    {
+      "args": [
+        7,
+        [
+          3
+        ]
+      ],
+      "expected": [
+        10
+      ]
+    },
+    {
+      "args": [
+        1,
+        [
+          1,
+          -2,
+          3,
+          -4,
+          5,
+          -6
+        ]
+      ],
+      "expected": [
+        2,
+        0,
+        3,
+        -1,
+        4,
+        -2
+      ]
+    },
+    {
+      "args": [
+        0,
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ]
+      ],
+      "expected": [
+        1,
+        3,
+        6,
+        10,
+        15,
+        21,
+        28,
+        36,
+        45,
+        55,
+        66,
+        78,
+        91,
+        105,
+        120,
+        136,
+        153,
+        171,
+        190,
+        210
+      ]
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Keep one running total instead of re-adding from the start each time.",
+    "A single variable for the current balance is all the state you need.",
+    "Loop over changes, add each one to the balance, and append the balance to the answer."
+  ],
+  "followUps": [
+    "How would you answer 'what was the balance after transaction i?' for many i without a loop each time?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(n)"
+  }
+}

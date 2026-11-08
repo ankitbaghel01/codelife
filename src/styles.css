@@ -538,3 +538,17 @@ kbd {
 .intro.loading {
   animation: none;
 }
+
+/* Phone: jobs and resume */
+.job-card { display: grid; gap: 4px; padding: 12px 14px; border-radius: 12px; border: 1px solid #22384b; background: #13212e; font-size: 14px; list-style: none; }
+.job-card.current { border-color: var(--gold); margin-bottom: 12px; }
+.job-card .actions, .resume .actions { display: flex; gap: 8px; margin-top: 6px; }
+.status { font-style: normal; font-size: 12px; color: #9fb4c6; }
+.status.pending, .status.accepted { color: var(--blue); }
+.status.attended { color: var(--ok); }
+.resume { margin-top: 20px; display: grid; gap: 8px; }
+.resume label { font-weight: 600; font-size: 14px; }
+.phone textarea { width: 100%; padding: 8px 12px; border-radius: 10px; border: 1px solid #22384b; background: #0a131b; color: inherit; font: inherit; resize: vertical; }
+.phone textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.project { display: grid; gap: 6px; border: 1px solid #22384b; border-radius: 10px; padding: 10px; }
+.project legend { font-size: 12px; color: #9fb4c6; padding: 0 4px; }

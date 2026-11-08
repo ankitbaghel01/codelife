@@ -1,0 +1,316 @@
+{
+  "javascript": [
+    {
+      "id": "js-let-const-var",
+      "label": "JavaScript variable scope (var, let, const)",
+      "question": "What is the difference between var, let and const in JavaScript?",
+      "keyPoints": [
+        {
+          "point": "var is function-scoped; let and const are block-scoped",
+          "keywords": [
+            "function scope",
+            "function-scoped",
+            "block scope",
+            "block-scoped",
+            "block"
+          ]
+        },
+        {
+          "point": "const cannot be reassigned (but an object it holds can still change)",
+          "keywords": [
+            "reassign",
+            "re-assign",
+            "constant",
+            "cannot change",
+            "can't change",
+            "mutate"
+          ]
+        },
+        {
+          "point": "var is hoisted and initialised as undefined; let/const are in the temporal dead zone",
+          "keywords": ["hoist", "temporal dead zone", "tdz", "undefined"]
+        }
+      ]
+    },
+    {
+      "id": "js-closure",
+      "label": "JavaScript closures",
+      "question": "What is a closure in JavaScript? Give a small example of where you would use one.",
+      "keyPoints": [
+        {
+          "point": "A function remembers variables from the scope where it was created",
+          "keywords": ["remember", "outer", "scope", "lexical", "enclosing"]
+        },
+        {
+          "point": "It keeps access even after the outer function has returned",
+          "keywords": ["returned", "after", "still access", "even after"]
+        },
+        {
+          "point": "A practical use: private state, counters, callbacks or event handlers",
+          "keywords": [
+            "private",
+            "counter",
+            "callback",
+            "handler",
+            "factory",
+            "data hiding",
+            "encapsulat"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "js-equality",
+      "label": "JavaScript equality (== vs ===)",
+      "question": "In JavaScript, what is the difference between == and ===? Which one would you use and why?",
+      "keyPoints": [
+        {
+          "point": "== converts types before comparing (type coercion)",
+          "keywords": ["coerc", "convert", "conversion", "loose"]
+        },
+        {
+          "point": "=== compares value and type without conversion",
+          "keywords": [
+            "strict",
+            "type and value",
+            "value and type",
+            "same type",
+            "without conver",
+            "no conver"
+          ]
+        },
+        {
+          "point": "Prefer === to avoid surprising results such as 0 == '' being true",
+          "keywords": [
+            "prefer",
+            "always use ===",
+            "use ===",
+            "surpris",
+            "bug",
+            "safer",
+            "predictable"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "js-event-loop",
+      "label": "The JavaScript event loop",
+      "question": "JavaScript runs on a single thread. How does it still handle things like timers and network requests without freezing?",
+      "keyPoints": [
+        {
+          "point": "Slow work is handed to the browser/runtime (Web APIs) and runs in the background",
+          "keywords": [
+            "web api",
+            "browser",
+            "background",
+            "runtime",
+            "asynchronous",
+            "async"
+          ]
+        },
+        {
+          "point": "Finished work puts a callback in a queue",
+          "keywords": ["queue", "callback", "task", "microtask"]
+        },
+        {
+          "point": "The event loop runs queued callbacks when the call stack is empty",
+          "keywords": ["event loop", "call stack", "stack is empty", "empty"]
+        }
+      ]
+    },
+    {
+      "id": "js-promise",
+      "label": "JavaScript promises and async/await",
+      "question": "What is a Promise, and how does async/await relate to it?",
+      "keyPoints": [
+        {
+          "point": "A Promise represents a value that will be available later (pending, fulfilled, rejected)",
+          "keywords": [
+            "future",
+            "later",
+            "eventual",
+            "pending",
+            "fulfill",
+            "resolve",
+            "reject"
+          ]
+        },
+        {
+          "point": "Results are handled with then/catch",
+          "keywords": [".then", "then", "catch"]
+        },
+        {
+          "point": "async/await is cleaner syntax over promises; await pauses the async function until it settles",
+          "keywords": [
+            "syntax",
+            "sugar",
+            "await",
+            "pause",
+            "wait",
+            "readable",
+            "try"
+          ]
+        }
+      ]
+    }
+  ],
+  "dsa": [
+    {
+      "id": "dsa-array-vs-linked-list",
+      "label": "Arrays vs linked lists",
+      "question": "When would you choose a linked list over an array? Compare them for access and insertion.",
+      "keyPoints": [
+        {
+          "point": "Arrays give O(1) access by index; linked lists need O(n) to reach a position",
+          "keywords": [
+            "index",
+            "random access",
+            "o(1) access",
+            "constant time access",
+            "o(n) access",
+            "traverse"
+          ]
+        },
+        {
+          "point": "Linked lists insert/delete in O(1) once you have the node; arrays shift elements, O(n)",
+          "keywords": ["insert", "delete", "shift", "o(1) insert"]
+        },
+        {
+          "point": "Arrays are contiguous memory (cache friendly); linked lists store extra pointers",
+          "keywords": [
+            "contiguous",
+            "memory",
+            "cache",
+            "pointer",
+            "extra space",
+            "overhead"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dsa-hash-map",
+      "label": "How hash maps work",
+      "question": "How does a hash map give average O(1) lookups, and what can make it slower?",
+      "keyPoints": [
+        {
+          "point": "A hash function turns the key into a bucket index",
+          "keywords": ["hash function", "hash", "bucket", "index"]
+        },
+        {
+          "point": "Collisions are handled by chaining or open addressing",
+          "keywords": [
+            "collision",
+            "chaining",
+            "open addressing",
+            "probing",
+            "linked list"
+          ]
+        },
+        {
+          "point": "Many collisions or a bad hash can degrade to O(n); resizing keeps the load factor low",
+          "keywords": [
+            "o(n)",
+            "worst case",
+            "load factor",
+            "resize",
+            "rehash",
+            "bad hash"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dsa-stack-queue",
+      "label": "Stacks vs queues",
+      "question": "What is the difference between a stack and a queue? Give one real use of each.",
+      "keyPoints": [
+        {
+          "point": "A stack is last-in, first-out (LIFO)",
+          "keywords": [
+            "lifo",
+            "last in first out",
+            "last-in",
+            "last in, first out"
+          ]
+        },
+        {
+          "point": "A queue is first-in, first-out (FIFO)",
+          "keywords": [
+            "fifo",
+            "first in first out",
+            "first-in",
+            "first in, first out"
+          ]
+        },
+        {
+          "point": "Real uses: undo/call stack/bracket matching for stacks; BFS/task scheduling/printing for queues",
+          "keywords": [
+            "undo",
+            "call stack",
+            "bracket",
+            "recursion",
+            "bfs",
+            "schedul",
+            "printer",
+            "line",
+            "buffer",
+            "browser history"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dsa-binary-search",
+      "label": "Binary search",
+      "question": "Explain binary search. What does it need from the input, and what is its time complexity?",
+      "keyPoints": [
+        {
+          "point": "The input must be sorted (or monotonic)",
+          "keywords": ["sorted", "monotonic", "ordered"]
+        },
+        {
+          "point": "Compare with the middle and discard half each step",
+          "keywords": ["middle", "mid", "half", "halve", "discard"]
+        },
+        {
+          "point": "Runs in O(log n) time",
+          "keywords": ["o(log n)", "log n", "logarithmic", "logn"]
+        }
+      ]
+    },
+    {
+      "id": "dsa-bfs-dfs",
+      "label": "BFS vs DFS",
+      "question": "What is the difference between breadth-first search and depth-first search on a graph? When would you pick BFS?",
+      "keyPoints": [
+        {
+          "point": "BFS explores level by level using a queue",
+          "keywords": [
+            "level",
+            "queue",
+            "breadth",
+            "neighbours first",
+            "neighbors first"
+          ]
+        },
+        {
+          "point": "DFS goes deep first using a stack or recursion",
+          "keywords": [
+            "deep",
+            "depth",
+            "stack",
+            "recursion",
+            "recursive",
+            "backtrack"
+          ]
+        },
+        {
+          "point": "BFS finds the shortest path in an unweighted graph",
+          "keywords": ["shortest", "fewest", "minimum steps", "unweighted"]
+        }
+      ]
+    }
+  ]
+}

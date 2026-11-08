@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "companies": [
+    {
+      "id": "sutradhar",
+      "name": "Sutradhar Infotech",
+      "tier": "T1",
+      "about": "A 300-person services company that builds billing and booking software for 2,000 clinics across India.",
+      "location": "Tech Park, Namma Nagar",
+      "interviewer": {
+        "name": "Arjun Mehta",
+        "title": "Tech Lead",
+        "gender": "male",
+        "persona": "Calm and patient. Asks fundamentals, gives gentle hints, values clear explanations."
+      },
+      "roles": [
+        {
+          "id": "jr-web",
+          "title": "Junior Web Developer",
+          "packageLpa": 3.6,
+          "monthlySalary": 26000,
+          "workMode": "Office",
+          "requiredSkills": ["HTML", "CSS", "JavaScript"],
+          "minProficiency": { "JavaScript": 25 },
+          "rounds": [
+            {
+              "id": "tech",
+              "name": "Technical round",
+              "questions": [
+                { "kind": "intro", "mandatory": true },
+                { "kind": "resume", "mandatory": true },
+                { "kind": "concept", "topic": "javascript", "mandatory": true },
+                { "kind": "coding", "tier": "T1", "mandatory": true },
+                { "kind": "complexity", "mandatory": false }
+              ]
+            },
+            {
+              "id": "hr",
+              "name": "HR round",
+              "questions": [{ "kind": "hr", "mandatory": true }]
+            }
+          ],
+          "hiring": {
+            "minCodingPassRate": 0.7,
+            "minConceptScore": 0.5,
+            "minOverallScore": 0.55
+          }
+        }
+      ]
+    },
+    {
+      "id": "kiranacart",
+      "name": "KiranaCart",
+      "tier": "T2",
+      "about": "A 60-person startup that lets neighbourhood grocery shops take orders online.",
+      "location": "Startup Street, Namma Nagar",
+      "interviewer": {
+        "name": "Neha Iyer",
+        "title": "Engineering Manager",
+        "gender": "female",
+        "persona": "Friendly but direct. Likes practical examples from your projects."
+      },
+      "roles": [
+        {
+          "id": "frontend",
+          "title": "Frontend Developer",
+          "packageLpa": 6.5,
+          "monthlySalary": 46000,
+          "workMode": "Hybrid",
+          "requiredSkills": ["JavaScript"],
+          "minProficiency": { "JavaScript": 40, "DSA": 25 },
+          "rounds": [
+            {
+              "id": "tech",
+              "name": "Technical round",
+              "questions": [
+                { "kind": "intro", "mandatory": true },
+                { "kind": "resume", "mandatory": true },
+                { "kind": "concept", "topic": "dsa", "mandatory": true },
+                { "kind": "coding", "tier": "T2", "mandatory": true },
+                { "kind": "complexity", "mandatory": true }
+              ]
+            },
+            {
+              "id": "hr",
+              "name": "HR round",
+              "questions": [{ "kind": "hr", "mandatory": true }]
+            }
+          ],
+          "hiring": {
+            "minCodingPassRate": 0.8,
+            "minConceptScore": 0.55,
+            "minOverallScore": 0.6
+          }
+        }
+      ]
+    },
+    {
+      "id": "rupiya",
+      "name": "Rupiya",
+      "tier": "T3",
+      "about": "A 400-person fintech that moves UPI payouts for small shops.",
+      "location": "Finance District, Namma Nagar",
+      "interviewer": {
+        "name": "Meera Rao",
+        "title": "Senior Engineer",
+        "gender": "female",
+        "persona": "Sharp and fair. Pushes on complexity and edge cases, gives good hints."
+      },
+      "roles": [
+        {
+          "id": "sde1",
+          "title": "Software Engineer (SDE-1)",
+          "packageLpa": 14,
+          "monthlySalary": 95000,
+          "workMode": "Office",
+          "requiredSkills": [],
+          "minProficiency": { "DSA": 50, "Problem solving": 45 },
+          "rounds": [
+            {
+              "id": "dsa1",
+              "name": "DSA round",
+              "questions": [
+                { "kind": "intro", "mandatory": true },
+                { "kind": "coding", "tier": "T2", "mandatory": true },
+                { "kind": "complexity", "mandatory": true }
+              ]
+            },
+            {
+              "id": "dsa2",
+              "name": "Problem-solving round",
+              "questions": [
+                { "kind": "concept", "topic": "dsa", "mandatory": true },
+                { "kind": "coding", "tier": "T3", "mandatory": true }
+              ]
+            },
+            {
+              "id": "hr",
+              "name": "Hiring manager",
+              "questions": [
+                { "kind": "resume", "mandatory": true },
+                { "kind": "hr", "mandatory": true }
+              ]
+            }
+          ],
+          "hiring": {
+            "minCodingPassRate": 0.9,
+            "minConceptScore": 0.6,
+            "minOverallScore": 0.7
+          }
+        }
+      ]
+    },
+    {
+      "id": "nimbus",
+      "name": "Nimbus Labs",
+      "tier": "T4",
+      "about": "A global product company building cloud tools used by millions of developers.",
+      "location": "Lakeside Campus, Namma Nagar",
+      "interviewer": {
+        "name": "Vikram Shah",
+        "title": "Staff Engineer",
+        "gender": "male",
+        "persona": "Quiet and precise. Expects optimal solutions and clear reasoning."
+      },
+      "roles": [
+        {
+          "id": "sde",
+          "title": "Software Development Engineer",
+          "packageLpa": 32,
+          "monthlySalary": 210000,
+          "workMode": "Hybrid",
+          "requiredSkills": [],
+          "minProficiency": {
+            "DSA": 75,
+            "Problem solving": 70,
+            "Communication": 50
+          },
+          "rounds": [
+            {
+              "id": "dsa1",
+              "name": "Coding round 1",
+              "questions": [
+                { "kind": "intro", "mandatory": true },
+                { "kind": "coding", "tier": "T3", "mandatory": true },
+                { "kind": "complexity", "mandatory": true }
+              ]
+            },
+            {
+              "id": "dsa2",
+              "name": "Coding round 2",
+              "questions": [
+                { "kind": "coding", "tier": "T3", "mandatory": true },
+                { "kind": "concept", "topic": "dsa", "mandatory": true }
+              ]
+            },
+            {
+              "id": "hr",
+              "name": "Bar raiser",
+              "questions": [
+                { "kind": "resume", "mandatory": true },
+                { "kind": "hr", "mandatory": true }
+              ]
+            }
+          ],
+          "hiring": {
+            "minCodingPassRate": 1.0,
+            "minConceptScore": 0.7,
+            "minOverallScore": 0.8
+          }
+        }
+      ]
+    }
+  ]
+}

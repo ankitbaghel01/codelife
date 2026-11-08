@@ -1,0 +1,300 @@
+/* City map and reception overlays (src/world). Uses the tokens from src/styles.css. */
+.citymap {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(
+    ellipse at 80% 0%,
+    #5a3814 0%,
+    #241a12 55%,
+    var(--ink) 100%
+  );
+  color: var(--text);
+}
+.citymap-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--line);
+}
+.citymap-head h2 {
+  font: 400 40px/1 var(--display);
+  letter-spacing: 1.5px;
+  margin: 2px 0 0;
+}
+.citymap-clock {
+  margin: 0 0 0 auto;
+  color: var(--muted);
+}
+.citymap-close {
+  background: transparent;
+  color: var(--text);
+  font-size: 20px;
+  border-radius: 12px;
+}
+.citymap-close:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.citymap-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr minmax(300px, 360px);
+  gap: 20px;
+  padding: 20px 24px 24px;
+}
+.citymap-board {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  container-type: size;
+}
+.citymap-art {
+  position: relative;
+  aspect-ratio: 1000 / 640;
+  width: min(100cqw, 100cqh * 1.5625);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.citymap-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.citymap-district {
+  font: 600 13px var(--mono);
+  letter-spacing: 3px;
+  fill: #f5e2c0;
+  opacity: 0.6;
+}
+
+/* Pins: the dot sits exactly on the place; label to the right, badge above. */
+.pin {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  transform: translate(-11px, -50%);
+  text-align: left;
+}
+.pin-dot {
+  flex: none;
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--panel-solid);
+  border: 4px solid var(--muted);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+.pin.home .pin-dot {
+  border-color: var(--blue);
+}
+.pin-dot.today,
+.pin.today .pin-dot {
+  border-color: var(--gold);
+  background: #fff3d6;
+}
+.pin-dot.later,
+.pin.later .pin-dot {
+  border-color: var(--blue);
+}
+.pin-dot.work,
+.pin.work .pin-dot {
+  border-color: var(--ok);
+  background: #e3f5df;
+}
+.pin.today .pin-dot {
+  animation: cm-pulse 1.8s ease-out infinite;
+}
+.pin-label {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: var(--panel);
+  border: 1px solid transparent;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.pin-label b {
+  font-size: 14px;
+}
+.pin-label small {
+  font: 500 11px var(--mono);
+  color: var(--muted);
+}
+.pin.soon .pin-label {
+  opacity: 0.7;
+}
+.pin.soon .pin-dot {
+  border-style: dashed;
+}
+.pin:hover .pin-label,
+.pin.on .pin-label {
+  border-color: var(--gold);
+}
+.pin:focus-visible {
+  outline: none;
+}
+.pin:focus-visible .pin-label {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.pin-badge {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 4px);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font: 600 11px var(--mono);
+  white-space: nowrap;
+  background: var(--gold);
+  color: var(--ink);
+}
+.pin.later .pin-badge {
+  background: var(--blue);
+}
+.pin.work .pin-badge {
+  background: var(--ok);
+}
+@keyframes cm-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(242, 181, 68, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(242, 181, 68, 0);
+  }
+}
+
+/* Side card */
+.citymap-card {
+  align-self: stretch;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+  border-radius: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.citymap-card h3 {
+  font: 400 34px/1 var(--display);
+  letter-spacing: 1px;
+  margin: 0;
+}
+.citymap-card p {
+  margin: 0;
+}
+.citymap-sub {
+  color: var(--muted);
+  font-size: 14px;
+}
+.citymap-card .facts {
+  margin: 4px 0;
+}
+.chip {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font: 600 12px var(--mono);
+  background: var(--gold);
+  color: var(--ink);
+}
+.chip.later {
+  background: var(--blue);
+}
+.chip.work {
+  background: var(--ok);
+}
+.citymap-why {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(240, 113, 103, 0.35);
+  background: rgba(240, 113, 103, 0.06);
+  color: var(--muted);
+  font-size: 14px;
+}
+.citymap-go {
+  margin-top: auto;
+}
+.citymap-empty {
+  color: var(--muted);
+}
+.citymap-empty p {
+  margin: 0 0 10px;
+}
+.citymap-legend {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: grid;
+  gap: 10px;
+}
+.citymap-legend li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 860px) {
+  .citymap-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(240px, 1fr) auto;
+    overflow: auto;
+    padding: 12px 16px 16px;
+  }
+  .citymap-head {
+    padding: 10px 16px;
+  }
+  .pin-label small {
+    display: none;
+  }
+}
+
+/* Reception */
+.reception {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: end center;
+  padding: 24px 16px 48px;
+  background: linear-gradient(transparent 40%, rgba(20, 17, 15, 0.7));
+}
+.reception-card {
+  width: min(620px, 100%);
+  padding: 24px 28px;
+  border-radius: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+}
+.reception-line {
+  font-size: 19px;
+  margin: 10px 0 18px;
+}
+.reception-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin.today .pin-dot {
+    animation: none;
+  }
+}

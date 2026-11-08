@@ -21,7 +21,12 @@ export const CONFIG = {
     { name: "Problem solving", proficiency: 20 },
     { name: "Communication", proficiency: 25 },
   ],
-  costs: { meal: 120 },
+  costs: { meal: 120, rent: 4000 },
+  travelMinutes: 30, // bus ride between home and anywhere in the city
+  rentEvery: 30, // days; the landlord's message says rent is due on day 30
+  interview: { minute: 11 * 60, cooldownDays: 7 },
+  work: { startMinute: 9 * 60, endMinute: 18 * 60, shiftMinutes: 8 * 60, energyCost: 35, fullMonthDays: 20 },
+  practiceGain: { easy: 2, medium: 4, hard: 6 } as Record<string, number>,
   rates: {
     hungerPerHour: 5, // hunger rises 0 → 100
     energyPerHour: 3, // energy falls 100 → 0

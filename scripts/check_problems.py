@@ -11,7 +11,8 @@ import threading
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent / "content" / "problems"
-SOLUTIONS = ROOT / "solutions"
+# server-only interview bank: same schema, never bundled into the client
+BANKS = [ROOT, ROOT.parent / "interview"]
 sys.path.insert(0, str(ROOT.parent))
 import harness  # noqa: E402  content/harness.py, the same file the browser runs
 
@@ -143,9 +144,9 @@ def validate(p, path):
     return errs
 
 
-def run_reference(p):
+def run_reference(p, bank):
     """Run the reference solution through content/harness.py with which='all'."""
-    path = SOLUTIONS / f"{p['id']}.py"
+    path = bank / "solutions" / f"{p['id']}.py"
     if not path.exists():
         return None, f"missing solution {path.relative_to(ROOT.parent.parent)}"
     box = {}
@@ -168,10 +169,11 @@ def run_reference(p):
 
 
 def main():
-    files = sorted(ROOT.glob("*.json"))
-    if not files:
-        print(f"No problem files in {ROOT}")
-        return 1
+    files = [f for bank in BANKS for f in sorted(bank.glob("*.json"))]
+    for bank in BANKS:
+        if not any(bank.glob("*.json")):
+            print(f"No problem files in {bank}")
+            return 1
     failures, seen, total_tests, counts = [], {}, 0, {}
     for path in files:
         try:
@@ -196,7 +198,7 @@ def main():
         starter = harness.run_tests(p["starter"]["python"], p, "visible")
         if starter["compileError"]:
             failures.append(f"{pid}: starter does not load: {starter['compileError']}")
-        res, err = run_reference(p)
+        res, err = run_reference(p, path.parent)
         if err or res["compileError"]:
             failures.append(f"{pid}: {err or res['compileError']}")
             continue
@@ -208,7 +210,7 @@ def main():
                 failures.append(f"{pid}: {r['name']} {r['error'] or 'wrong answer'}")
         total_tests += len(res["results"])
         print(
-            f"{'PASS' if passed == len(res['results']) else 'FAIL'}  {pid:<32} {passed}/{len(res['results'])} tests"
+            f"{'PASS' if passed == len(res['results']) else 'FAIL'}  {path.parent.name + '/' + pid:<44} {passed}/{len(res['results'])} tests"
         )
 
     print("\nProblems per folder/topic:")
@@ -380,6 +382,26 @@ def self_test_harness():
         harness.run_tests("def f(t):\n    return t\n", tr, "all")["ok"],
         "TreeNode round-trip",
     )
+    # run_inputs (server grading): outputs only, no expected values needed
+    r = harness.run_inputs(
+        "def add(a, b):\n    if a < 0:\n        raise ValueError('secret')\n    return a + b\n",
+        prob["function"],
+        [{"args": [1, 2], "hidden": False}, {"args": [-1, 1], "hidden": True}],
+    )
+    check(
+        r["compileError"] is None
+        and [o["got"] for o in r["outputs"]] == [3, None]
+        and r["outputs"][1]["error"] == "ValueError (line 3)",
+        f"run_inputs shape {r!r}",
+    )
+    check(
+        harness.run_inputs("def plus(a, b): pass\n", prob["function"], [])[
+            "compileError"
+        ]
+        == "Define a function named add",
+        "run_inputs missing function",
+    )
+    json.dumps(r)
     return fails
 
 

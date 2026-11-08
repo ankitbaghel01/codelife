@@ -1,0 +1,189 @@
+{
+  "id": "iv-t2-shortest-window",
+  "version": 1,
+  "title": "Fuel Stops",
+  "tier": "T2",
+  "difficulty": "medium",
+  "folder": "interview-prep",
+  "topic": "sliding-window",
+  "tags": [
+    "sliding-window",
+    "two-pointers"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "A delivery bike passes fuel stations in order; `nums[i]` is the litres you can buy at station `i` (always positive).\n\nReturn the length of the **shortest run of consecutive stations** whose litres add up to **at least** `target`. Return `0` if no run is enough.",
+  "function": {
+    "name": "shortest_window",
+    "params": [
+      {
+        "name": "target",
+        "type": "int"
+      },
+      {
+        "name": "nums",
+        "type": "list[int]"
+      }
+    ],
+    "returns": "int"
+  },
+  "constraints": [
+    "1 <= target <= 10^9",
+    "0 <= len(nums) <= 10^5",
+    "1 <= nums[i] <= 10^4"
+  ],
+  "examples": [
+    {
+      "args": [
+        7,
+        [
+          2,
+          3,
+          1,
+          2,
+          4,
+          3
+        ]
+      ],
+      "expected": 2,
+      "explanation": "[4, 3] sums to 7 with length 2."
+    },
+    {
+      "args": [
+        15,
+        [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      ],
+      "expected": 5,
+      "explanation": "Only the whole list reaches 15."
+    }
+  ],
+  "starter": {
+    "python": "def shortest_window(target, nums):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        100,
+        [
+          1,
+          2,
+          3
+        ]
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        4,
+        [
+          1,
+          4,
+          4
+        ]
+      ],
+      "expected": 1
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        1,
+        []
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        3,
+        [
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        11,
+        [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        5,
+        [
+          5
+        ]
+      ],
+      "expected": 1
+    },
+    {
+      "args": [
+        6,
+        [
+          10,
+          1,
+          1
+        ]
+      ],
+      "expected": 1
+    },
+    {
+      "args": [
+        21,
+        [
+          2,
+          9,
+          1,
+          1,
+          1,
+          8,
+          9,
+          3
+        ]
+      ],
+      "expected": 4
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "All values are positive, so growing a window only increases its sum.",
+    "Use two pointers for the window's left and right ends.",
+    "Extend right; while the sum is >= target, record the length and move left forward."
+  ],
+  "followUps": [
+    "What breaks if nums can contain negative numbers?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(1)"
+  }
+}

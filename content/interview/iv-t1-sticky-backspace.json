@@ -1,0 +1,127 @@
+{
+  "id": "iv-t1-sticky-backspace",
+  "version": 1,
+  "title": "Sticky Backspace",
+  "tier": "T1",
+  "difficulty": "easy",
+  "folder": "data-structures",
+  "topic": "stack",
+  "tags": [
+    "stack",
+    "strings"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "Your laptop's backspace key is broken and types `#` instead. Given what was `typed`, return the text that should be on screen, treating every `#` as a backspace that deletes the character before it (if there is one).",
+  "function": {
+    "name": "final_text",
+    "params": [
+      {
+        "name": "typed",
+        "type": "str"
+      }
+    ],
+    "returns": "str"
+  },
+  "constraints": [
+    "0 <= len(typed) <= 10^5",
+    "typed contains printable ASCII characters"
+  ],
+  "examples": [
+    {
+      "args": [
+        "abc#d"
+      ],
+      "expected": "abd",
+      "explanation": "c is deleted, then d is typed: abd."
+    },
+    {
+      "args": [
+        "##a"
+      ],
+      "expected": "a",
+      "explanation": "Backspace on an empty screen does nothing."
+    }
+  ],
+  "starter": {
+    "python": "def final_text(typed):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        "a#b#"
+      ],
+      "expected": ""
+    },
+    {
+      "args": [
+        "hello"
+      ],
+      "expected": "hello"
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        ""
+      ],
+      "expected": ""
+    },
+    {
+      "args": [
+        "ab##c"
+      ],
+      "expected": "c"
+    },
+    {
+      "args": [
+        "x###y#z"
+      ],
+      "expected": "z"
+    },
+    {
+      "args": [
+        "co#ode"
+      ],
+      "expected": "code"
+    },
+    {
+      "args": [
+        "####"
+      ],
+      "expected": ""
+    },
+    {
+      "args": [
+        "a b#c"
+      ],
+      "expected": "a c"
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "The last character typed is the first one a backspace removes.",
+    "That is a stack: push characters, pop on #.",
+    "Use a list as a stack; pop only when it is non-empty; join it at the end."
+  ],
+  "followUps": [
+    "Can you compare two typed strings for equality using O(1) extra space?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(n)"
+  }
+}

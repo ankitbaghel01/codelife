@@ -33,6 +33,11 @@ PH_MODELS = [
     "ceiling_fan",
     "electric_stove",
     "drawer_cabinet",
+    # interview office (src/world/OfficeScene.tsx)
+    "metal_office_desk",
+    "modern_arm_chair_01",
+    "modern_ceiling_lamp_01",
+    "potted_plant_01",
 ]
 PH_TEXTURES = [
     "wood_floor_worn",
@@ -48,6 +53,13 @@ HERO_TEX = "m013"
 ANIMS = {
     "idle": "Animations/all_animations_max_motextr_static/m_idle_neutral_01.max.fbx",
     "walk": "Animations/all_animations_max_motextr_xy/m_walk_neutral_01.max.fbx",
+}
+
+# Interviewer NPCs (src/world/OfficeScene.tsx): avatar folder -> texture prefix, plus seated idle animations.
+NPCS = {"Male_Adult_08": "m014", "Female_Adult_02": "f002"}
+NPC_ANIMS = {
+    "m_sit": "Animations/all_animations_max_motextr_static/m_sit_chair_idle_neutral_01.max.fbx",
+    "f_sit": "Animations/all_animations_max_motextr_static/f_sit_chair_idle_neutral_01.max.fbx",
 }
 
 
@@ -85,7 +97,13 @@ def fetch_models() -> None:
 
 
 def fetch_textures() -> None:
-    maps = {"Diffuse": "diff", "col_1": "diff", "nor_gl": "nor", "Rough": "rough", "arm": "arm"}
+    maps = {
+        "Diffuse": "diff",
+        "col_1": "diff",
+        "nor_gl": "nor",
+        "Rough": "rough",
+        "arm": "arm",
+    }
     for t in PH_TEXTURES:
         files = ph_files(t)
         for key, short in maps.items():
@@ -102,11 +120,10 @@ def fetch_hdri() -> None:
         save(dest, get(ph_files(PH_HDRI)["hdri"]["1k"]["hdr"]["url"]))
 
 
-def fetch_hero() -> None:
-    base = f"{RB}/Avatars/Adults/{HERO}"
-    out = ROOT / "hero"
-    if not (out / f"{HERO}.fbx").exists():
-        save(out / f"{HERO}.fbx", get(f"{base}/Export/{HERO}.fbx"))
+def fetch_avatar(name: str, tex: str, out: Path) -> None:
+    base = f"{RB}/Avatars/Adults/{name}"
+    if not (out / f"{name}.fbx").exists():
+        save(out / f"{name}.fbx", get(f"{base}/Export/{name}.fbx"))
     for part in [
         "body_color",
         "body_normal",
@@ -116,16 +133,21 @@ def fetch_hero() -> None:
     ]:
         # Opacity keeps its alpha channel (hair, eyelashes), so it stays PNG; the rest become JPG.
         ext = "png" if part == "opacity_color" else "jpg"
-        dest = out / "textures" / f"{HERO_TEX}_{part}.{ext}"
+        dest = out / "textures" / f"{tex}_{part}.{ext}"
         if dest.exists():
             continue
-        im = Image.open(io.BytesIO(get(f"{base}/Textures/{HERO_TEX}_{part}.tga")))
+        im = Image.open(io.BytesIO(get(f"{base}/Textures/{tex}_{part}.tga")))
         im = im.convert("RGBA" if ext == "png" else "RGB").resize(
             (1024, 1024), Image.LANCZOS
         )
         buf = io.BytesIO()
         im.save(buf, "PNG" if ext == "png" else "JPEG", quality=88, optimize=True)
         save(dest, buf.getvalue())
+
+
+def fetch_hero() -> None:
+    out = ROOT / "hero"
+    fetch_avatar(HERO, HERO_TEX, out)
     for name, path in ANIMS.items():
         if not (out / f"anim_{name}.fbx").exists():
             save(out / f"anim_{name}.fbx", get(f"{RB}/{path}"))
@@ -138,11 +160,24 @@ def fetch_hero() -> None:
         )
 
 
+def fetch_npcs() -> None:
+    out = ROOT / "npc"
+    for name, tex in NPCS.items():
+        fetch_avatar(name, tex, out)
+    for name, path in NPC_ANIMS.items():
+        if not (out / f"anim_{name}.fbx").exists():
+            save(out / f"anim_{name}.fbx", get(f"{RB}/{path}"))
+    if not (out / "LICENSE.txt").exists():
+        save(out / "LICENSE.txt", (ROOT / "hero" / "LICENSE.txt").read_bytes())
+
+
 def write_credits() -> None:
     (ROOT / "CREDITS.md").write_text(
         "# Asset credits\n\n"
         f"- Hero: Microsoft Rocketbox `{HERO}` and animations, MIT licence (see hero/LICENSE.txt). "
         "https://github.com/microsoft/Microsoft-Rocketbox\n"
+        f"- Interviewers: Microsoft Rocketbox {', '.join(f'`{n}`' for n in NPCS)} and seated idle "
+        "animations, MIT licence (see npc/LICENSE.txt).\n"
         "- Furniture, props, textures and HDRI: Poly Haven, CC0. https://polyhaven.com\n"
         f"  Models: {', '.join(PH_MODELS)}\n"
         f"  Textures: {', '.join(PH_TEXTURES)}; HDRI: {PH_HDRI}\n",
@@ -151,7 +186,14 @@ def write_credits() -> None:
 
 
 if __name__ == "__main__":
-    steps = [fetch_hero, fetch_hdri, fetch_textures, fetch_models, write_credits]
+    steps = [
+        fetch_hero,
+        fetch_npcs,
+        fetch_hdri,
+        fetch_textures,
+        fetch_models,
+        write_credits,
+    ]
     failed = []
     for step in steps:
         try:

@@ -1,0 +1,188 @@
+{
+  "id": "iv-t2-path-sum",
+  "version": 1,
+  "title": "Treasure Trail",
+  "tier": "T2",
+  "difficulty": "medium",
+  "folder": "data-structures",
+  "topic": "tree",
+  "tags": [
+    "tree",
+    "dfs"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "A treasure map is a binary tree of numbers. Return `True` if some path from the **root down to a leaf** (a node with no children) adds up exactly to `target`, otherwise `False`. An empty tree has no paths.\n\nTrees are passed as a `TreeNode` (with `.val`, `.left`, `.right`; the class is already defined). In examples a tree is written level by level, with `None` for a missing child.",
+  "function": {
+    "name": "has_path_sum",
+    "params": [
+      {
+        "name": "root",
+        "type": "TreeNode"
+      },
+      {
+        "name": "target",
+        "type": "int"
+      }
+    ],
+    "returns": "bool"
+  },
+  "constraints": [
+    "0 <= number of nodes <= 5000",
+    "-1000 <= node value <= 1000"
+  ],
+  "examples": [
+    {
+      "args": [
+        [
+          5,
+          4,
+          8,
+          11,
+          null,
+          13,
+          4,
+          7,
+          2
+        ],
+        22
+      ],
+      "expected": true,
+      "explanation": "5 -> 4 -> 11 -> 2 adds up to 22."
+    },
+    {
+      "args": [
+        [
+          1,
+          2,
+          3
+        ],
+        5
+      ],
+      "expected": false,
+      "explanation": "Root-to-leaf sums are 3 and 4."
+    }
+  ],
+  "starter": {
+    "python": "def has_path_sum(root, target):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        [],
+        0
+      ],
+      "expected": false
+    },
+    {
+      "args": [
+        [
+          1,
+          2
+        ],
+        1
+      ],
+      "expected": false
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        [
+          1
+        ],
+        1
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        [
+          1,
+          2
+        ],
+        3
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        [
+          -2,
+          null,
+          -3
+        ],
+        -5
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        [
+          1,
+          -2,
+          3,
+          1,
+          null,
+          null,
+          null,
+          -1
+        ],
+        -1
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        [
+          3,
+          9,
+          20,
+          null,
+          null,
+          15,
+          7
+        ],
+        30
+      ],
+      "expected": true
+    },
+    {
+      "args": [
+        [
+          0,
+          1,
+          1
+        ],
+        0
+      ],
+      "expected": false
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Only paths that end at a leaf count.",
+    "Recursion fits trees: subtract the node's value and ask the children.",
+    "Base cases: empty node -> False; leaf -> is the remaining target equal to its value?"
+  ],
+  "followUps": [
+    "How would you return all such paths instead of True/False?"
+  ],
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(h)"
+  }
+}

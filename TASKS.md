@@ -29,28 +29,32 @@ Tracks the phases in the PRD (`LIFE_exe_Game_PRD_and_Claude_Code_Prompt.md`, sec
 - [x] Laptop "ByteOS": Files app with Basics / Data Structures / Interview Prep folders (40 problems), Code IDE (Monaco)
 - [x] Python Run and Submit in the browser (Pyodide worker + shared `content/harness.py`); Accepted / Wrong answer / errors; submission history
 
-## Phase 2: career foundation (next)
+## Phase 2: career foundation (done, verified in a browser)
+- [x] Practice raises proficiency through explicit rules (first accepted solution: DSA +2/4/6, Problem solving +half, Python +1 if listed), with evidence log
+- [x] Resume builder (phone → Profile): summary + up to 5 projects, validated
+- [x] Fictional companies and roles (`content/companies.json`, T1–T4), invitation rules (qualify by listed skills + measured proficiency, one per day, 7-day cooldown, missed interviews expire)
+- [x] Jobs tab: invitation details, accept/decline
+- [x] City map (front door) and company visit: travel time, reception check-in, office interview scene with a seated Rocketbox interviewer
 
-- [ ] Backend: FastAPI + database (SQLite locally, Postgres in production), save service
-- [ ] Study and practice on the laptop that raise proficiency through explicit rules
-- [ ] Resume builder
-- [ ] Fictional companies and roles, invitation rules, Jobs inbox
-- [ ] Street and company office scene; reception and interview entry
+## Phase 3: interview engine (done)
+- [x] FastAPI backend (`server/`), SQLite persistence, resumable interviews
+- [x] Rounds and questions from company config: intro, resume, concept, coding, complexity, HR; mandatory questions can't be skipped
+- [x] AI provider abstraction: Claude (when `ANTHROPIC_API_KEY` is set) or a scripted interviewer; typed, validated outputs; fallback on errors
 
-## Phase 3: interview engine
+## Phase 4: full-screen coding interview (done)
+- [x] Full-viewport workstation, Monaco, Run (visible tests) vs one final Submit (all tests)
+- [x] Executor adapter: Judge0 (`JUDGE0_URL`) or a clearly labelled DEV subprocess executor
+- [x] Hidden tests and solutions are server-only (separate `content/interview/` bank, blocked in the dev server, absent from the build); the sandbox receives inputs only and the server grades outputs
 
-- [ ] Interview sessions, rounds, text conversation, AI provider abstraction, typed outputs
+## Phase 5: hiring and career (done)
+- [x] Deterministic hiring (coding pass rate, concept score, overall) per company thresholds; the AI can't override code results
+- [x] Result report with reasons, code, reference solution, topics to revise; offer letter; accept/decline
+- [x] Job, workdays (09:00–17:00 start, energy cost), pro-rated monthly salary, rent every 30 days
 
-## Phase 4: full-screen coding
-
-- [ ] Monaco IDE that takes over the screen; Python Run (sample tests) in a Pyodide worker
-- [ ] Submit with hidden tests via a sandbox (Judge0 on a Linux VM); clearly labelled dev adapter until then
-- [ ] Server strips hidden tests and solutions before a problem reaches the browser
-
-## Phase 5: hiring and career
-
-- [ ] Hiring criteria per company, offer letter, salary and expenses
-
-## Phase 6: polish
-
-- [ ] Realistic art pass (glTF assets), sound, accessibility review, end-to-end tests
+## Phase 6: polish (in progress)
+- [x] HUD only in the apartment; workstation title readable at laptop widths
+- [ ] Real sandbox: deploy Judge0 on a Linux VM (the dev executor is not isolated)
+- [ ] Test with a real Claude API key
+- [ ] Indian-looking characters and city view, newer laptop model, asset compression
+- [ ] Library and café, more companies and roles, promotions
+- [ ] Narrow-screen layouts, end-to-end test automation

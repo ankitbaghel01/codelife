@@ -175,22 +175,14 @@ def _syntax_error(e, code):
 # ---------- main entry ----------
 
 
-def run_tests(user_code, problem, which):
-    fn = problem["function"]
-    fname = fn["name"]
-    in_types = [p.get("type") for p in fn["params"]]
-    out_type = fn.get("returns")
-
-    def fail(msg):
-        return {"ok": False, "compileError": msg, "results": []}
-
+def _load(user_code, fname):
+    """Compile and exec player code; return (function, None) or (None, error text)."""
     try:
         code_obj = compile(user_code, USER_FILE, "exec")
     except (SyntaxError, ValueError) as e:  # ValueError: null bytes in source
-        return fail(
+        return None, (
             _syntax_error(e, user_code) if isinstance(e, SyntaxError) else _clip(str(e))
         )
-
     ns = {
         "__name__": "__solution__",
         "__builtins__": builtins,
@@ -202,12 +194,49 @@ def run_tests(user_code, problem, which):
     try:
         exec(code_obj, ns)
     except (Exception, SystemExit) as e:
-        return fail(_describe(e))
+        return None, _describe(e)
     finally:
         sys.stdout = real_stdout
     func = ns.get(fname)
     if not callable(func):
-        return fail(f"Define a function named {fname}")
+        return None, f"Define a function named {fname}"
+    return func, None
+
+
+def _call(func, raw_args, in_types, out_type, hidden):
+    """Call the player's function once. Returns (got as plain JSON, error, stdout, ms)."""
+    real_stdout = sys.stdout
+    buf = io.StringIO()
+    got, error = None, None
+    args = [
+        _IN[ty](copy.deepcopy(a)) if ty in _IN else copy.deepcopy(a)
+        for a, ty in zip(raw_args, in_types)
+    ]
+    sys.stdout = buf
+    start = time.perf_counter()
+    try:
+        raw = func(*args)
+    except (Exception, SystemExit) as e:
+        raw, error = None, _describe(e, with_message=not hidden)
+    finally:
+        elapsed = (time.perf_counter() - start) * 1000
+        sys.stdout = real_stdout
+    if error is None:
+        try:
+            got = _OUT[out_type](raw) if out_type in _OUT else _jsonable(raw)
+        except (TypeError, ValueError) as e:
+            error = _clip(f"{type(e).__name__}: {e}")
+    return got, error, _clip(buf.getvalue()), elapsed
+
+
+def run_tests(user_code, problem, which):
+    fn = problem["function"]
+    in_types = [p.get("type") for p in fn["params"]]
+    out_type = fn.get("returns")
+
+    func, load_error = _load(user_code, fn["name"])
+    if load_error:
+        return {"ok": False, "compileError": load_error, "results": []}
 
     groups = [
         ("example", "Example", problem.get("examples", [])),
@@ -221,27 +250,8 @@ def run_tests(user_code, problem, which):
     for kind, label, tests in groups:
         for i, t in enumerate(tests, 1):
             hidden = kind == "hidden"
-            buf = io.StringIO()
-            got, error, passed = None, None, False
-            args = [
-                _IN[ty](copy.deepcopy(a)) if ty in _IN else copy.deepcopy(a)
-                for a, ty in zip(t["args"], in_types)
-            ]
-            sys.stdout = buf
-            start = time.perf_counter()
-            try:
-                raw = func(*args)
-            except (Exception, SystemExit) as e:
-                raw, error = None, _describe(e, with_message=not hidden)
-            finally:
-                elapsed = (time.perf_counter() - start) * 1000
-                sys.stdout = real_stdout
-            if error is None:
-                try:
-                    got = _OUT[out_type](raw) if out_type in _OUT else _jsonable(raw)
-                    passed = _same(got, t["expected"], mode, tol)
-                except (TypeError, ValueError) as e:
-                    error = _clip(f"{type(e).__name__}: {e}")
+            got, error, out, elapsed = _call(func, t["args"], in_types, out_type, hidden)
+            passed = error is None and _same(got, t["expected"], mode, tol)
             results.append(
                 {
                     "name": f"{label} {i}",
@@ -251,9 +261,9 @@ def run_tests(user_code, problem, which):
                     # and exception messages are reduced to type + line
                     "args": None if hidden else copy.deepcopy(t["args"]),
                     "expected": None if hidden else t["expected"],
-                    "got": None if hidden else _jsonable(got),
+                    "got": None if hidden else got,
                     "error": error,
-                    "stdout": "" if hidden else _clip(buf.getvalue()),
+                    "stdout": "" if hidden else out,
                     "timeMs": round(elapsed, 3),
                 }
             )
@@ -262,3 +272,25 @@ def run_tests(user_code, problem, which):
         "compileError": None,
         "results": results,
     }
+
+
+def run_inputs(user_code, function, cases):
+    """Run player code on inputs only, for a server that compares results itself.
+
+    function: the problem's "function" spec; cases: [{"args": [...], "hidden": bool}].
+    Returns {"compileError", "outputs": [{"got", "error", "stdout", "timeMs"}]}.
+    No expected values or compare rule are needed, so none can leak to player code.
+    """
+    func, load_error = _load(user_code, function["name"])
+    if load_error:
+        return {"compileError": load_error, "outputs": []}
+    in_types = [p.get("type") for p in function["params"]]
+    outputs = []
+    for c in cases:
+        got, error, out, elapsed = _call(
+            func, c["args"], in_types, function.get("returns"), c.get("hidden", False)
+        )
+        outputs.append(
+            {"got": got, "error": error, "stdout": out, "timeMs": round(elapsed, 3)}
+        )
+    return {"compileError": None, "outputs": outputs}

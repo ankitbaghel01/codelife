@@ -8,7 +8,9 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "check": "node scripts/check.mjs",
-    "check:problems": "python scripts/check_problems.py"
+    "check:problems": "python scripts/check_problems.py",
+    "server": "python -m uvicorn server.main:app --port 8000 --reload",
+    "test:server": "python -m pytest server/tests -q"
   },
   "dependencies": {
     "@monaco-editor/react": "4.6.0",

@@ -1,4 +1,5 @@
 import { CONFIG } from "./config.ts";
+import COMPANIES from "../../content/companies.json" with { type: "json" };
 
 // Deterministic game rules. UI and AI never change state except through these functions.
 
@@ -21,9 +22,36 @@ export type Message = {
   day: number;
   read: boolean;
 };
+export type Project = { name: string; description: string };
+export type Resume = { summary: string; projects: Project[] };
+export type Invitation = {
+  id: string;
+  companyId: string;
+  roleId: string;
+  day: number; // interview day
+  time: number; // interview start, game minutes
+  status: "pending" | "accepted" | "declined" | "expired" | "attended";
+  createdDay: number;
+};
+export type Job = {
+  companyId: string;
+  roleId: string;
+  title: string;
+  monthlySalary: number;
+  startDay: number;
+  daysWorked: number; // since the last payday
+  lastWorkedDay: number;
+};
+export type Evidence = {
+  day: number;
+  skill: string;
+  delta: number;
+  reason: string;
+};
 
 export type GameState = {
   version: 1;
+  playerId: string;
   name: string;
   day: number;
   minute: number; // 0–1439
@@ -32,12 +60,27 @@ export type GameState = {
   skills: Skill[];
   ledger: Txn[];
   messages: Message[];
+  resume: Resume;
+  invitations: Invitation[];
+  job: Job | null;
+  solved: string[]; // practice problem ids solved at least once
+  evidence: Evidence[];
 };
 
 export type Result = { state: GameState; error?: string };
 
+export type Company = (typeof COMPANIES.companies)[number];
+export type Role = Company["roles"][number];
+export const companies: Company[] = COMPANIES.companies;
+export const findCompany = (id: string) => companies.find((c) => c.id === id);
+export const findRole = (companyId: string, roleId: string) =>
+  findCompany(companyId)?.roles.find((r) => r.id === roleId);
+
 const clamp = (n: number) =>
   Math.max(0, Math.min(100, Math.round(n * 10) / 10));
+const newId = () =>
+  globalThis.crypto?.randomUUID?.() ??
+  `p-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 
 export function validName(raw: string): string | undefined {
   const s = raw.trim();
@@ -47,10 +90,11 @@ export function validName(raw: string): string | undefined {
     return "Use letters, spaces, dots, apostrophes or hyphens.";
 }
 
-export function newGame(rawName: string): GameState {
+export function newGame(rawName: string, playerId = newId()): GameState {
   const s = CONFIG.start;
-  return {
+  const g: GameState = {
     version: 1,
+    playerId,
     name: rawName.trim(),
     day: s.day,
     minute: s.minute,
@@ -67,7 +111,13 @@ export function newGame(rawName: string): GameState {
       },
     ],
     messages: CONFIG.messages.map((m) => ({ ...m, day: s.day, read: false })),
+    resume: { summary: "", projects: [] },
+    invitations: [],
+    job: null,
+    solved: [],
+    evidence: [],
   };
+  return refreshInvitations(g);
 }
 
 export const balance = (s: GameState) =>
@@ -81,28 +131,79 @@ function addTxn(s: GameState, label: string, amount: number): GameState {
   };
 }
 
-/** Advance the clock; hunger and energy drift at fixed hourly rates. */
+function addMessage(
+  s: GameState,
+  id: string,
+  from: string,
+  text: string,
+): GameState {
+  if (s.messages.some((m) => m.id === id)) return s;
+  return {
+    ...s,
+    messages: [...s.messages, { id, from, text, day: s.day, read: false }],
+  };
+}
+
+/** Advance the clock; hunger and energy drift at fixed hourly rates. Crossing midnight runs the new-day rules. */
 export function tick(s: GameState, minutes: number): GameState {
   const total = s.minute + minutes;
   const h = minutes / 60;
-  return {
+  let g: GameState = {
     ...s,
     day: s.day + Math.floor(total / 1440),
     minute: total % 1440,
     hunger: clamp(s.hunger + h * CONFIG.rates.hungerPerHour),
     energy: clamp(s.energy - h * CONFIG.rates.energyPerHour),
   };
+  for (let d = s.day + 1; d <= g.day; d++) g = onNewDay({ ...g, day: d });
+  return g;
 }
 
 /** Sleep until the next morning. */
 export function sleep(s: GameState): GameState {
-  return {
+  return onNewDay({
     ...s,
     day: s.day + 1,
     minute: CONFIG.rates.wakeMinute,
     energy: 100,
     hunger: clamp(s.hunger + CONFIG.rates.sleepHunger),
-  };
+  });
+}
+
+/** Rent, payday and new job invitations, once per game day. */
+export function onNewDay(s: GameState): GameState {
+  let g = s;
+  if (g.day % CONFIG.rentEvery === 0) {
+    g = addTxn(g, "Rent", -CONFIG.costs.rent);
+    g = addMessage(
+      g,
+      `rent-${g.day}`,
+      "Mr. Gowda (landlord)",
+      `Rent of ₹${CONFIG.costs.rent.toLocaleString("en-IN")} received. Thank you.`,
+    );
+  }
+  const j = g.job;
+  if (j && g.day > j.startDay && (g.day - j.startDay) % 30 === 0) {
+    // Salary is pro-rated by days actually worked, so skipping work has a cost.
+    const pay = Math.round(
+      (j.monthlySalary * Math.min(j.daysWorked, CONFIG.work.fullMonthDays)) /
+        CONFIG.work.fullMonthDays,
+    );
+    g = { ...g, job: { ...j, daysWorked: 0 } };
+    if (pay > 0)
+      g = addTxn(
+        g,
+        `Salary · ${findCompany(j.companyId)?.name ?? j.companyId}`,
+        pay,
+      );
+    g = addMessage(
+      g,
+      `pay-${g.day}`,
+      findCompany(j.companyId)?.name ?? "Payroll",
+      `Payday: ₹${pay.toLocaleString("en-IN")} credited for ${j.daysWorked} day(s) worked.`,
+    );
+  }
+  return refreshInvitations(g);
 }
 
 export function eat(s: GameState): Result {
@@ -178,7 +279,248 @@ export function markRead(s: GameState, id: string): GameState {
   };
 }
 
-/** Saves come from localStorage, so check the shape before trusting them. */
+// ---------- Practice (PRD 8, Flow B) ----------
+
+function raise(
+  s: GameState,
+  skill: string,
+  delta: number,
+  reason: string,
+): GameState {
+  const i = s.skills.findIndex(
+    (k) => k.name.toLowerCase() === skill.toLowerCase(),
+  );
+  if (i < 0 || delta <= 0) return s;
+  const before = s.skills[i].proficiency;
+  const after = clamp(before + delta);
+  if (after === before) return s;
+  return {
+    ...s,
+    skills: s.skills.map((k, j) =>
+      j === i ? { ...k, proficiency: after } : k,
+    ),
+    evidence: [
+      ...s.evidence,
+      { day: s.day, skill: s.skills[i].name, delta: after - before, reason },
+    ].slice(-200),
+  };
+}
+
+/** First accepted solution of a practice problem raises DSA, problem solving and (if listed) Python. */
+export function practiceSolved(
+  s: GameState,
+  p: { id: string; title: string; difficulty: string },
+): GameState {
+  if (s.solved.includes(p.id)) return s;
+  const gain = CONFIG.practiceGain[p.difficulty] ?? CONFIG.practiceGain.easy;
+  const why = `Solved “${p.title}” (${p.difficulty})`;
+  let g: GameState = { ...s, solved: [...s.solved, p.id] };
+  g = raise(g, "DSA", gain, why);
+  g = raise(g, "Problem solving", gain / 2, why);
+  g = raise(g, "Python", 1, why);
+  return refreshInvitations(g);
+}
+
+// ---------- Resume (PRD 9) ----------
+
+export function setResume(s: GameState, r: Resume): Result {
+  const summary = r.summary.trim();
+  if (summary.length > 400)
+    return { state: s, error: "Keep the summary under 400 characters." };
+  if (r.projects.length > 5)
+    return { state: s, error: "List at most 5 projects." };
+  const projects = r.projects.map((p) => ({
+    name: p.name.trim(),
+    description: p.description.trim(),
+  }));
+  if (projects.some((p) => !p.name || p.name.length > 60))
+    return {
+      state: s,
+      error: "Each project needs a name under 60 characters.",
+    };
+  if (projects.some((p) => p.description.length > 300))
+    return {
+      state: s,
+      error: "Keep each project description under 300 characters.",
+    };
+  return { state: { ...s, resume: { summary, projects } } };
+}
+
+// ---------- Job invitations (PRD 9.1: explicit rules, no AI) ----------
+
+export function qualifies(s: GameState, role: Role): boolean {
+  const level = (name: string) =>
+    s.skills.find((k) => k.name.toLowerCase() === name.toLowerCase());
+  return (
+    role.requiredSkills.every((name) => level(name)) &&
+    Object.entries(role.minProficiency).every(
+      ([name, min]) => (level(name)?.proficiency ?? 0) >= (min as number),
+    )
+  );
+}
+
+/** Expire missed interviews, then invite the player to the best company they now qualify for (one per day). */
+export function refreshInvitations(s: GameState): GameState {
+  let g: GameState = {
+    ...s,
+    invitations: s.invitations.map((v) =>
+      (v.status === "pending" || v.status === "accepted") && v.day < s.day
+        ? { ...v, status: "expired" }
+        : v,
+    ),
+  };
+  if (g.invitations.some((v) => v.createdDay === g.day)) return g;
+  const cool = CONFIG.interview.cooldownDays;
+  const open = (cid: string) =>
+    g.invitations.some(
+      (v) =>
+        v.companyId === cid &&
+        (v.status === "pending" || v.status === "accepted"),
+    ) ||
+    g.invitations.some(
+      (v) =>
+        v.companyId === cid &&
+        v.status !== "expired" &&
+        g.day - v.createdDay < cool,
+    ) ||
+    g.job?.companyId === cid;
+  const pick = [...companies]
+    .reverse() // companies.json lists tiers low → high; invite to the highest the player qualifies for
+    .find((c) => !open(c.id) && qualifies(g, c.roles[0]));
+  if (!pick) return g;
+  const role = pick.roles[0];
+  const inv: Invitation = {
+    id: `${pick.id}-${g.day}`,
+    companyId: pick.id,
+    roleId: role.id,
+    day: g.day + 1,
+    time: CONFIG.interview.minute,
+    status: "pending",
+    createdDay: g.day,
+  };
+  g = { ...g, invitations: [...g.invitations, inv] };
+  return addMessage(
+    g,
+    `invite-${inv.id}`,
+    `${pick.name} · HR`,
+    `Hi ${g.name}, we liked your profile. Interview for ${role.title} (₹${role.packageLpa} LPA) on Day ${inv.day} at 11:00, ${pick.location}. Open the Jobs tab to accept.`,
+  );
+}
+
+export function respondInvitation(
+  s: GameState,
+  id: string,
+  accept: boolean,
+): Result {
+  const v = s.invitations.find((x) => x.id === id);
+  if (!v || v.status !== "pending")
+    return { state: s, error: "This invitation can't be changed any more." };
+  return {
+    state: {
+      ...s,
+      invitations: s.invitations.map((x) =>
+        x.id === id ? { ...x, status: accept ? "accepted" : "declined" } : x,
+      ),
+    },
+  };
+}
+
+/** You may enter the company on the interview day, from 9:00 until the end of the working day. */
+export function canAttend(s: GameState, v: Invitation): string | undefined {
+  if (v.status !== "accepted")
+    return v.status === "pending"
+      ? "Accept the invitation first (Phone → Jobs)."
+      : "This interview is closed.";
+  if (s.day < v.day) return `Your interview is on Day ${v.day}.`;
+  if (s.day > v.day) return "You missed this interview.";
+  if (s.minute < CONFIG.work.startMinute || s.minute > CONFIG.work.endMinute)
+    return "The office is open 09:00–18:00.";
+}
+
+type Offer = {
+  companyId: string;
+  roleId: string;
+  title: string;
+  monthlySalary: number;
+  joinInDays: number;
+};
+
+/** Record the interview outcome. Employment changes only when the player accepts an offer (PRD 13). */
+export function interviewOutcome(
+  s: GameState,
+  invitationId: string,
+  offer: Offer | null,
+  accepted: boolean,
+): GameState {
+  let g: GameState = {
+    ...s,
+    invitations: s.invitations.map((x) =>
+      x.id === invitationId ? { ...x, status: "attended" } : x,
+    ),
+  };
+  const company = findCompany(
+    offer?.companyId ??
+      s.invitations.find((x) => x.id === invitationId)?.companyId ??
+      "",
+  );
+  if (offer && accepted) {
+    g = {
+      ...g,
+      job: {
+        companyId: offer.companyId,
+        roleId: offer.roleId,
+        title: offer.title,
+        monthlySalary: offer.monthlySalary,
+        startDay: g.day + offer.joinInDays,
+        daysWorked: 0,
+        lastWorkedDay: 0,
+      },
+    };
+    g = addMessage(
+      g,
+      `joined-${invitationId}`,
+      `${company?.name ?? "HR"} · HR`,
+      `Welcome aboard! You start as ${offer.title} on Day ${g.day + offer.joinInDays}. Work hours are 09:00–18:00.`,
+    );
+  } else if (!offer) {
+    g = addMessage(
+      g,
+      `rejected-${invitationId}`,
+      `${company?.name ?? "HR"} · HR`,
+      "Thank you for interviewing with us. We won't move forward this time. Your report shows what to practise next.",
+    );
+  }
+  return g;
+}
+
+/** A work shift at your company: costs time and energy, counts towards this month's pay, builds experience. */
+export function goToWork(s: GameState): Result {
+  const j = s.job;
+  if (!j) return { state: s, error: "You don't have a job yet." };
+  if (s.day < j.startDay)
+    return { state: s, error: `You start on Day ${j.startDay}.` };
+  if (j.lastWorkedDay === s.day)
+    return { state: s, error: "You've already worked today." };
+  if (
+    s.minute < CONFIG.work.startMinute ||
+    s.minute > CONFIG.work.endMinute - 60
+  )
+    return { state: s, error: "Your shift starts between 09:00 and 17:00." };
+  if (s.energy < CONFIG.work.energyCost)
+    return { state: s, error: "You're too tired to work. Sleep first." };
+  let g = tick(
+    { ...s, job: { ...j, daysWorked: j.daysWorked + 1, lastWorkedDay: s.day } },
+    CONFIG.work.shiftMinutes,
+  );
+  g = { ...g, energy: clamp(g.energy - CONFIG.work.energyCost) };
+  g = raise(g, "Problem solving", 0.5, "A day of real work");
+  g = raise(g, "Communication", 0.5, "A day of real work");
+  return { state: g };
+}
+
+// ---------- Saves ----------
+
+/** Saves come from localStorage, so check the shape before trusting them; older saves get the new fields. */
 export function parseSave(raw: string | null): GameState | null {
   if (!raw) return null;
   try {
@@ -199,8 +541,26 @@ export function parseSave(raw: string | null): GameState | null {
       v.ledger.every(
         (t: Txn) => num(t?.id) && num(t.amount) && typeof t.label === "string",
       ) &&
-      Array.isArray(v.messages);
-    return ok ? (v as GameState) : null;
+      Array.isArray(v.messages) &&
+      (v.invitations === undefined || Array.isArray(v.invitations)) &&
+      (v.solved === undefined ||
+        (Array.isArray(v.solved) &&
+          v.solved.every((x: unknown) => typeof x === "string")));
+    if (!ok) return null;
+    return {
+      ...v,
+      playerId: typeof v.playerId === "string" ? v.playerId : newId(),
+      resume:
+        v.resume &&
+        typeof v.resume.summary === "string" &&
+        Array.isArray(v.resume.projects)
+          ? v.resume
+          : { summary: "", projects: [] },
+      invitations: v.invitations ?? [],
+      job: v.job ?? null,
+      solved: v.solved ?? [],
+      evidence: Array.isArray(v.evidence) ? v.evidence : [],
+    } as GameState;
   } catch {
     return null;
   }

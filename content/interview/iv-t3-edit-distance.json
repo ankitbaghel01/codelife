@@ -1,0 +1,141 @@
+{
+  "id": "iv-t3-edit-distance",
+  "version": 1,
+  "title": "Typo Fixer",
+  "tier": "T3",
+  "difficulty": "hard",
+  "folder": "interview-prep",
+  "topic": "dynamic-programming",
+  "tags": [
+    "dynamic-programming",
+    "strings"
+  ],
+  "languages": [
+    "python"
+  ],
+  "statement": "An autocorrect feature needs to know how far a typed word is from a dictionary word.\n\nReturn the **minimum number of single-character edits** (insert one character, delete one character, or replace one character) that turn `a` into `b`.",
+  "function": {
+    "name": "edit_distance",
+    "params": [
+      {
+        "name": "a",
+        "type": "str"
+      },
+      {
+        "name": "b",
+        "type": "str"
+      }
+    ],
+    "returns": "int"
+  },
+  "constraints": [
+    "0 <= len(a), len(b) <= 500",
+    "lowercase English letters"
+  ],
+  "examples": [
+    {
+      "args": [
+        "horse",
+        "ros"
+      ],
+      "expected": 3,
+      "explanation": "horse -> rorse (replace h) -> rose (delete r) -> ros (delete e)."
+    },
+    {
+      "args": [
+        "",
+        "abc"
+      ],
+      "expected": 3,
+      "explanation": "Insert all three letters."
+    }
+  ],
+  "starter": {
+    "python": "def edit_distance(a, b):\n    # Write your solution here\n    pass\n"
+  },
+  "visibleTests": [
+    {
+      "args": [
+        "same",
+        "same"
+      ],
+      "expected": 0
+    },
+    {
+      "args": [
+        "cat",
+        "cut"
+      ],
+      "expected": 1
+    }
+  ],
+  "hiddenTests": [
+    {
+      "args": [
+        "intention",
+        "execution"
+      ],
+      "expected": 5
+    },
+    {
+      "args": [
+        "abc",
+        ""
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        "a",
+        "b"
+      ],
+      "expected": 1
+    },
+    {
+      "args": [
+        "kitten",
+        "sitting"
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        "abcdef",
+        "azced"
+      ],
+      "expected": 3
+    },
+    {
+      "args": [
+        "aaaa",
+        "aa"
+      ],
+      "expected": 2
+    }
+  ],
+  "compare": "exact",
+  "limits": {
+    "timeMs": 2000,
+    "memoryMb": 128
+  },
+  "hintsPolicy": {
+    "interview": "ladder",
+    "steps": [
+      "nudge",
+      "data structure",
+      "partial approach"
+    ]
+  },
+  "hints": [
+    "Think about the last characters of both words.",
+    "Let dp[i][j] be the answer for the first i letters of a and first j letters of b.",
+    "If the letters match, dp[i][j] = dp[i-1][j-1]; else 1 + min(delete, insert, replace)."
+  ],
+  "followUps": [
+    "Can you reduce the memory to two rows?"
+  ],
+  "complexity": {
+    "time": "O(m*n)",
+    "space": "O(m*n)"
+  }
+}
